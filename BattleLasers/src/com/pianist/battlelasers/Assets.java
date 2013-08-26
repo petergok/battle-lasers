@@ -12,6 +12,12 @@ public class Assets
 	public static Pixmap gameMenuButtonNor;
 
 	public static Pixmap gameMenuButtonClck;
+	
+	public static Pixmap instMenuButtonNor;
+
+	public static Pixmap instMenuButtonClck;
+	
+	public static Pixmap background;
 
 	public static Pixmap undoButtonNor;
 

@@ -73,7 +73,6 @@ public class MainMenuScreen extends Screen
 		{
 			loaded = true;
 
-			// Load the game screen graphics if necessary
 			if (loadImages)
 			{
 				Assets.gameMenuButtonNor = g.newPixmap(
@@ -152,47 +151,89 @@ public class MainMenuScreen extends Screen
 						"CannonTopLeftHighlight.png", PixmapFormat.ARGB4444);
 				Assets.gunTRHighlight = g.newPixmap(
 						"CannonTopRightHighlight.png", PixmapFormat.ARGB4444);
+
+				Assets.mainMenuBackground = g.newPixmap(
+						"MainMenuBackground.png", PixmapFormat.ARGB4444);
+
+				Assets.playGameButtonNor = g.newPixmap(
+						"PlayGameButtonNormal.png", PixmapFormat.ARGB4444);
+				Assets.playGameButtonClck = g.newPixmap(
+						"PlayGameButtonClicked.png", PixmapFormat.ARGB4444);
+
+				Assets.instructionsButtonNor = g.newPixmap(
+						"InstructionsButtonNormal.png", PixmapFormat.ARGB4444);
+				Assets.instructionsButtonClck = g.newPixmap(
+						"InstructionsButtonClicked.png", PixmapFormat.ARGB4444);
+				
+				Assets.instMenuButtonNor = g.newPixmap(
+						"InstMenuButtonNormal.png", PixmapFormat.ARGB4444);
+				Assets.instMenuButtonClck = g.newPixmap(
+						"InstMenuButtonClicked.png", PixmapFormat.ARGB4444);
+
+				Assets.aboutButtonNor = g.newPixmap("AboutButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.aboutButtonClck = g.newPixmap("AboutButtonClicked.png",
+						PixmapFormat.ARGB4444);
+
+				Assets.exitButtonNor = g.newPixmap("ExitButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.exitButtonClck = g.newPixmap("ExitButtonClicked.png",
+						PixmapFormat.ARGB4444);
+
+				Assets.aboutBackground = g.newPixmap("AboutBackground.png",
+						PixmapFormat.ARGB4444);
+				Assets.aboutBackButtonNor = g.newPixmap(
+						"AboutBackButtonNormal.png", PixmapFormat.ARGB4444);
+				Assets.aboutBackButtonClck = g.newPixmap(
+						"AboutBackButtonClicked.png", PixmapFormat.ARGB4444);
+
+				Assets.gameInstructions1 = g.newPixmap("Instructions1.png",
+						PixmapFormat.ARGB4444);
+				Assets.gameInstructions2 = g.newPixmap("Instructions2.png",
+						PixmapFormat.ARGB4444);
+				Assets.gameInstructions3 = g.newPixmap("Instructions3.png",
+						PixmapFormat.ARGB4444);
+				Assets.gameInstructions4 = g.newPixmap("Instructions4.png",
+						PixmapFormat.ARGB4444);
+				Assets.gameInstructions5 = g.newPixmap("Instructions5.png",
+						PixmapFormat.ARGB4444);
+				Assets.rightButtonNor = g.newPixmap("RightButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.rightButtonClck = g.newPixmap("RightButtonClicked.png",
+						PixmapFormat.ARGB4444);
+				Assets.leftButtonNor = g.newPixmap("LeftButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.leftButtonClck = g.newPixmap("LeftButtonClicked.png",
+						PixmapFormat.ARGB4444);
+
+				Assets.background = g.newPixmap("Background.png",
+						PixmapFormat.ARGB4444);
+
+				Assets.gameSetupBackground = g.newPixmap("GameSetupScreen.png",
+						PixmapFormat.ARGB4444);
+				Assets.mode2PlayerSel = g.newPixmap("DoubleDigitSelect.png",
+						PixmapFormat.ARGB4444);
+				Assets.mode1PlayerSel = g.newPixmap("1PlayerSelect.png",
+						PixmapFormat.ARGB4444);
+				Assets.singleDigitSelect = g.newPixmap("SingleDigitSelect.png",
+						PixmapFormat.ARGB4444);
+				Assets.doubleDigitSelect = g.newPixmap("DoubleDigitSelect.png",
+						PixmapFormat.ARGB4444);
+				Assets.mixedSelect = g.newPixmap("MixedSelect.png",
+						PixmapFormat.ARGB4444);
 			}
 
-			Assets.mainMenuBackground = g.newPixmap("MainMenuBackground.png",
-					PixmapFormat.ARGB4444);
-
-			Assets.playGameButtonNor = g.newPixmap("PlayGameButtonNormal.png",
-					PixmapFormat.ARGB4444);
-			Assets.playGameButtonClck = g.newPixmap(
-					"PlayGameButtonClicked.png", PixmapFormat.ARGB4444);
 			playGameButton = new Button(140, 325, Assets.playGameButtonNor,
 					Assets.playGameButtonClck);
-
-			Assets.instructionsButtonNor = g.newPixmap(
-					"InstructionsButtonNormal.png", PixmapFormat.ARGB4444);
-			Assets.instructionsButtonClck = g.newPixmap(
-					"InstructionsButtonClicked.png", PixmapFormat.ARGB4444);
 			instructionsButton = new Button(140, 415,
 					Assets.instructionsButtonNor, Assets.instructionsButtonClck);
-
-			Assets.aboutButtonNor = g.newPixmap("AboutButtonNormal.png",
-					PixmapFormat.ARGB4444);
-			Assets.aboutButtonClck = g.newPixmap("AboutButtonClicked.png",
-					PixmapFormat.ARGB4444);
 			aboutButton = new Button(140, 505, Assets.aboutButtonNor,
 					Assets.aboutButtonClck);
-
-			Assets.exitButtonNor = g.newPixmap("ExitButtonNormal.png",
-					PixmapFormat.ARGB4444);
-			Assets.exitButtonClck = g.newPixmap("ExitButtonClicked.png",
-					PixmapFormat.ARGB4444);
 			exitButton = new Button(140, 595, Assets.exitButtonNor,
 					Assets.exitButtonClck);
-
-			Assets.aboutBackground = g.newPixmap("AboutBackground.png",
-					PixmapFormat.ARGB4444);
-			Assets.aboutBackButtonNor = g.newPixmap(
-					"AboutBackButtonNormal.png", PixmapFormat.ARGB4444);
-			Assets.aboutBackButtonClck = g.newPixmap(
-					"AboutBackButtonClicked.png", PixmapFormat.ARGB4444);
 			aboutBackButton = new Button(342, 323, Assets.aboutBackButtonNor,
 					Assets.aboutBackButtonClck);
+
 		}
 		// If the graphics have finished loading
 		else
@@ -270,6 +311,7 @@ public class MainMenuScreen extends Screen
 		Graphics g = game.getGraphics();
 
 		// Draw the main menu background
+		g.drawPixmap(Assets.background, 0, 0);
 		g.drawPixmap(Assets.mainMenuBackground, 0, 0);
 
 		// Draw the about screen if it should be open
@@ -314,23 +356,7 @@ public class MainMenuScreen extends Screen
 	 */
 	public void dispose()
 	{
-		game.disposeImage(Assets.mainMenuBackground);
 
-		game.disposeImage(Assets.playGameButtonNor);
-		game.disposeImage(Assets.playGameButtonClck);
-
-		game.disposeImage(Assets.instructionsButtonNor);
-		game.disposeImage(Assets.instructionsButtonClck);
-
-		game.disposeImage(Assets.aboutButtonNor);
-		game.disposeImage(Assets.aboutButtonClck);
-
-		game.disposeImage(Assets.exitButtonNor);
-		game.disposeImage(Assets.exitButtonClck);
-
-		game.disposeImage(Assets.aboutBackButtonNor);
-		game.disposeImage(Assets.aboutBackButtonClck);
-		game.disposeImage(Assets.aboutBackground);
 	}
 
 }

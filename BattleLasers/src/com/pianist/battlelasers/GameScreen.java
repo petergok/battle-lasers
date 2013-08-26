@@ -2086,7 +2086,8 @@ public class GameScreen extends Screen
 		playerOneTurn = !playerOneTurn;
 
 		// Update the AI's grid and tell it to start calculating the next move if it is its turn
-		computerPlayer.userMadeMove(lastMove.reverse(), true);
+		if (match.onePlayer)
+			computerPlayer.userMadeMove(lastMove.reverse(), true);
 		if (match.onePlayer && !playerOneTurn)
 		{
 			computerPlayer.startCalculatingMove(lastMoveStart, lastMoveEnd);

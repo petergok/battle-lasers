@@ -25,10 +25,10 @@ public class InstructionsScreen extends Screen
 	private Button rightButton;
 
 	private Button leftButton;
+	
+	private Button menuButton;
 
 	private Match match;
-
-	private boolean leavingInstructions;
 
 	private boolean loadImages;
 
@@ -53,7 +53,6 @@ public class InstructionsScreen extends Screen
 		this.loadImages = loadImages;
 		loaded = false;
 		this.match = match;
-		leavingInstructions = false;
 	}
 
 	/**
@@ -71,32 +70,12 @@ public class InstructionsScreen extends Screen
 		if (!loaded)
 		{
 			loaded = true;
-
-			if (loadImages)
-			{
-				Assets.gameInstructions1 = g.newPixmap("Instructions1.png",
-						PixmapFormat.ARGB4444);
-				Assets.gameInstructions2 = g.newPixmap("Instructions2.png",
-						PixmapFormat.ARGB4444);
-				Assets.gameInstructions3 = g.newPixmap("Instructions3.png",
-						PixmapFormat.ARGB4444);
-				Assets.gameInstructions4 = g.newPixmap("Instructions4.png",
-						PixmapFormat.ARGB4444);
-				Assets.gameInstructions5 = g.newPixmap("Instructions5.png",
-						PixmapFormat.ARGB4444);
-				Assets.rightButtonNor = g.newPixmap("RightButtonNormal.png",
-						PixmapFormat.ARGB4444);
-				Assets.rightButtonClck = g.newPixmap("RightButtonClicked.png",
-						PixmapFormat.ARGB4444);
-				Assets.leftButtonNor = g.newPixmap("LeftButtonNormal.png",
-						PixmapFormat.ARGB4444);
-				Assets.leftButtonClck = g.newPixmap("LeftButtonClicked.png",
-						PixmapFormat.ARGB4444);
-			}
-			rightButton = new Button(288, 733, Assets.rightButtonNor,
+			rightButton = new Button(313, 733, Assets.rightButtonNor,
 					Assets.rightButtonClck);
-			leftButton = new Button(108, 733, Assets.leftButtonNor,
+			leftButton = new Button(83, 733, Assets.leftButtonNor,
 					Assets.leftButtonClck);
+			menuButton = new Button(181, 736, Assets.instMenuButtonNor,
+					Assets.instMenuButtonClck);
 		}
 		// If the graphics have finished then checks through the touch events
 		// for button clicks
@@ -119,40 +98,33 @@ public class InstructionsScreen extends Screen
 			for (int event = 0; event < size; event++)
 			{
 				TouchEvent nextEvent = touchEvents.get(event);
-				rightButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
-				leftButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
+				if (number != 5)
+					rightButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
+				if (number != 1)
+					leftButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
+				menuButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
 			}
 
 			// Immediately change screens to the game screen (change later)
 			// Goes forward or backward through the instruction screens
 			// according to which direction arrow was pressed
-			if (rightButton.wasReleased())
+			if (menuButton.wasReleased())
 			{
 				Screen nextScreen;
-				// If the final screen was reached, then the next arrow leads to
-				// the main menu
-				if (number == 5)
-				{
-					leavingInstructions = true;
-					nextScreen = new MainMenuScreen(game, false, match);
-				}
-				else
-					nextScreen = new InstructionsScreen(game, number + 1,
+				nextScreen = new MainMenuScreen (game, false, match);
+				game.setScreen(nextScreen);
+			}
+			else if (rightButton.wasReleased())
+			{
+				Screen nextScreen;
+				nextScreen = new InstructionsScreen(game, number + 1,
 							match, false);
 				game.setScreen(nextScreen);
 			}
 			else if (leftButton.wasReleased())
 			{
 				Screen nextScreen;
-				// If the instructions are still on their first screen, then the
-				// back arrow leads to the main menu
-				if (number == 1)
-				{
-					leavingInstructions = true;
-					nextScreen = new MainMenuScreen(game, false, match);
-				}
-				else
-					nextScreen = new InstructionsScreen(game, number - 1,
+				nextScreen = new InstructionsScreen(game, number - 1,
 							match, false);
 				game.setScreen(nextScreen);
 			}
@@ -169,6 +141,7 @@ public class InstructionsScreen extends Screen
 	public void present(float deltaTime)
 	{
 		Graphics g = game.getGraphics();
+		g.drawPixmap(Assets.background, 0, 0);
 		if (number == 1)
 			g.drawPixmap(Assets.gameInstructions1, 0, 0);
 		else if (number == 2)
@@ -180,8 +153,11 @@ public class InstructionsScreen extends Screen
 		else
 			g.drawPixmap(Assets.gameInstructions5, 0, 0);
 
-		rightButton.draw(g);
-		leftButton.draw(g);
+		if (number != 5)
+			rightButton.draw(g);
+		if (number != 1)
+			leftButton.draw(g);
+		menuButton.draw(g);
 
 	}
 
@@ -207,19 +183,6 @@ public class InstructionsScreen extends Screen
 	 */
 	public void dispose()
 	{
-		if (leavingInstructions)
-		{
-			game.disposeImage(Assets.rightButtonNor);
-			game.disposeImage(Assets.rightButtonClck);
-			game.disposeImage(Assets.leftButtonNor);
-			game.disposeImage(Assets.leftButtonClck);
-
-			game.disposeImage(Assets.gameInstructions1);
-			game.disposeImage(Assets.gameInstructions2);
-			game.disposeImage(Assets.gameInstructions3);
-			game.disposeImage(Assets.gameInstructions4);
-			game.disposeImage(Assets.gameInstructions5);
-		}
 	}
 
 }

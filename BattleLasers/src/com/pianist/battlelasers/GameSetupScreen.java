@@ -22,6 +22,8 @@ public class GameSetupScreen extends Screen
 
 	// Whether to load the game scren images
 	boolean loadImages;
+	
+	boolean startingGame;
 
 	// Store the buttons
 	Button leftButton;
@@ -51,6 +53,8 @@ public class GameSetupScreen extends Screen
 
 		match.reset();
 		this.match = match;
+		
+		startingGame = false;
 	}
 
 	/**
@@ -73,8 +77,8 @@ public class GameSetupScreen extends Screen
 			// If the game screen graphics haven't been loaded yet, load them
 			if (loadImages)
 			{
-				Assets.gameMenuButtonNor = g.newPixmap(
-						"GameMenuButtonNormal.png", PixmapFormat.ARGB4444);
+				Assets.gameMenuButtonNor = g.newPixmap("GameMenuButtonNormal.png",
+						PixmapFormat.ARGB4444);
 				Assets.gameMenuButtonClck = g.newPixmap(
 						"GameMenuButtonClicked.png", PixmapFormat.ARGB4444);
 				Assets.undoButtonNor = g.newPixmap("UndoButtonNormal.png",
@@ -88,8 +92,7 @@ public class GameSetupScreen extends Screen
 						PixmapFormat.ARGB4444);
 				Assets.shadedTile = g.newPixmap("ShadedTile.png",
 						PixmapFormat.ARGB4444);
-				Assets.target = g
-						.newPixmap("Target.png", PixmapFormat.ARGB4444);
+				Assets.target = g.newPixmap("Target.png", PixmapFormat.ARGB4444);
 				Assets.mirrorBorder = g.newPixmap("MirrorBorder.png",
 						PixmapFormat.ARGB4444);
 				Assets.gameTitleBar = g.newPixmap("GameTitleBar.png",
@@ -100,12 +103,10 @@ public class GameSetupScreen extends Screen
 				Assets.tileAnimation = new Pixmap[5];
 				for (int index = 0; index < 5; index++)
 				{
-					Assets.horAnimation[index] = g.newPixmap(
-							"HorizonalAnimation" + (index + 1) + ".png",
-							PixmapFormat.ARGB4444);
-					Assets.verAnimation[index] = g.newPixmap(
-							"VerticalAnimation" + (index + 1) + ".png",
-							PixmapFormat.ARGB4444);
+					Assets.horAnimation[index] = g.newPixmap("HorizonalAnimation"
+							+ (index + 1) + ".png", PixmapFormat.ARGB4444);
+					Assets.verAnimation[index] = g.newPixmap("VerticalAnimation"
+							+ (index + 1) + ".png", PixmapFormat.ARGB4444);
 					Assets.tileAnimation[index] = g.newPixmap("TileAnimation"
 							+ (index + 1) + ".png", PixmapFormat.ARGB4444);
 				}
@@ -127,7 +128,7 @@ public class GameSetupScreen extends Screen
 						PixmapFormat.ARGB4444);
 				Assets.gunTR = g.newPixmap("CannonTopRight.png",
 						PixmapFormat.ARGB4444);
-				
+
 				Assets.gunBLSel = g.newPixmap("CannonBottomLeftSelected.png",
 						PixmapFormat.ARGB4444);
 				Assets.gunBRSel = g.newPixmap("CannonBottomRightSelected.png",
@@ -136,43 +137,87 @@ public class GameSetupScreen extends Screen
 						PixmapFormat.ARGB4444);
 				Assets.gunTRSel = g.newPixmap("CannonTopRightSelected.png",
 						PixmapFormat.ARGB4444);
-				
-				Assets.gunBLHighlight = g.newPixmap("CannonBottomLeftHighlight.png",
-						PixmapFormat.ARGB4444);
-				Assets.gunBRHighlight = g.newPixmap("CannonBottomRightHighlight.png",
-						PixmapFormat.ARGB4444);
+
+				Assets.timerBar = g
+						.newPixmap("TimerBar.png", PixmapFormat.ARGB4444);
+
+				Assets.gunBLHighlight = g.newPixmap(
+						"CannonBottomLeftHighlight.png", PixmapFormat.ARGB4444);
+				Assets.gunBRHighlight = g.newPixmap(
+						"CannonBottomRightHighlight.png", PixmapFormat.ARGB4444);
 				Assets.gunTLHighlight = g.newPixmap("CannonTopLeftHighlight.png",
 						PixmapFormat.ARGB4444);
 				Assets.gunTRHighlight = g.newPixmap("CannonTopRightHighlight.png",
 						PixmapFormat.ARGB4444);
+
+				Assets.mainMenuBackground = g.newPixmap("MainMenuBackground.png",
+						PixmapFormat.ARGB4444);
+
+				Assets.playGameButtonNor = g.newPixmap("PlayGameButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.playGameButtonClck = g.newPixmap(
+						"PlayGameButtonClicked.png", PixmapFormat.ARGB4444);
+
+				Assets.instructionsButtonNor = g.newPixmap(
+						"InstructionsButtonNormal.png", PixmapFormat.ARGB4444);
+				Assets.instructionsButtonClck = g.newPixmap(
+						"InstructionsButtonClicked.png", PixmapFormat.ARGB4444);
+
+				Assets.aboutButtonNor = g.newPixmap("AboutButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.aboutButtonClck = g.newPixmap("AboutButtonClicked.png",
+						PixmapFormat.ARGB4444);
+
+				Assets.exitButtonNor = g.newPixmap("ExitButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.exitButtonClck = g.newPixmap("ExitButtonClicked.png",
+						PixmapFormat.ARGB4444);
+
+				Assets.aboutBackground = g.newPixmap("AboutBackground.png",
+						PixmapFormat.ARGB4444);
+				Assets.aboutBackButtonNor = g.newPixmap(
+						"AboutBackButtonNormal.png", PixmapFormat.ARGB4444);
+				Assets.aboutBackButtonClck = g.newPixmap(
+						"AboutBackButtonClicked.png", PixmapFormat.ARGB4444);
 				
-				Assets.timerBar = g.newPixmap("TimerBar.png", PixmapFormat.ARGB4444);
+				Assets.gameInstructions1 = g.newPixmap("Instructions1.png",
+						PixmapFormat.ARGB4444);
+				Assets.gameInstructions2 = g.newPixmap("Instructions2.png",
+						PixmapFormat.ARGB4444);
+				Assets.gameInstructions3 = g.newPixmap("Instructions3.png",
+						PixmapFormat.ARGB4444);
+				Assets.gameInstructions4 = g.newPixmap("Instructions4.png",
+						PixmapFormat.ARGB4444);
+				Assets.gameInstructions5 = g.newPixmap("Instructions5.png",
+						PixmapFormat.ARGB4444);
+				Assets.rightButtonNor = g.newPixmap("RightButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.rightButtonClck = g.newPixmap("RightButtonClicked.png",
+						PixmapFormat.ARGB4444);
+				Assets.leftButtonNor = g.newPixmap("LeftButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.leftButtonClck = g.newPixmap("LeftButtonClicked.png",
+						PixmapFormat.ARGB4444);
+				
+				Assets.background = g.newPixmap("Background.png",
+						PixmapFormat.ARGB4444);
+				
+				Assets.gameSetupBackground = g.newPixmap("GameSetupScreen.png",
+						PixmapFormat.ARGB4444);
+				Assets.mode2PlayerSel = g.newPixmap("DoubleDigitSelect.png",
+						PixmapFormat.ARGB4444);
+				Assets.mode1PlayerSel = g.newPixmap("1PlayerSelect.png",
+						PixmapFormat.ARGB4444);
+				Assets.singleDigitSelect = g.newPixmap("SingleDigitSelect.png",
+						PixmapFormat.ARGB4444);
+				Assets.doubleDigitSelect = g.newPixmap("DoubleDigitSelect.png",
+						PixmapFormat.ARGB4444);
+				Assets.mixedSelect = g.newPixmap("MixedSelect.png",
+						PixmapFormat.ARGB4444);
 			}
-
-			Assets.gameSetupBackground = g.newPixmap("GameSetupScreen.png",
-					PixmapFormat.ARGB4444);
-			Assets.mode2PlayerSel = g.newPixmap("DoubleDigitSelect.png",
-					PixmapFormat.ARGB4444);
-			Assets.mode1PlayerSel = g.newPixmap("1PlayerSelect.png",
-					PixmapFormat.ARGB4444);
-			Assets.singleDigitSelect = g.newPixmap("SingleDigitSelect.png",
-					PixmapFormat.ARGB4444);
-			Assets.doubleDigitSelect = g.newPixmap("DoubleDigitSelect.png",
-					PixmapFormat.ARGB4444);
-			Assets.mixedSelect = g.newPixmap("MixedSelect.png",
-					PixmapFormat.ARGB4444);
-
-			Assets.rightButtonNor = g.newPixmap("RightButtonNormal.png",
-					PixmapFormat.ARGB4444);
-			Assets.rightButtonClck = g.newPixmap("RightButtonClicked.png",
-					PixmapFormat.ARGB4444);
+			
 			rightButton = new Button(367, 727, Assets.rightButtonNor,
 					Assets.rightButtonClck);
-
-			Assets.leftButtonNor = g.newPixmap("LeftButtonNormal.png",
-					PixmapFormat.ARGB4444);
-			Assets.leftButtonClck = g.newPixmap("LeftButtonClicked.png",
-					PixmapFormat.ARGB4444);
 			leftButton = new Button(28, 727, Assets.leftButtonNor,
 					Assets.leftButtonClck);
 		}
@@ -270,6 +315,7 @@ public class GameSetupScreen extends Screen
 			// If the left or right buttons were released, change screens
 			if (rightButton.wasReleased())
 			{
+				startingGame = true;
 				Screen screen = new GameScreen(game, match);
 				game.setScreen(screen);
 			}
@@ -316,6 +362,7 @@ public class GameSetupScreen extends Screen
 		Graphics g = game.getGraphics();
 		
 		// Draw the background
+		g.drawPixmap(Assets.background, 0, 0);
 		g.drawPixmap(Assets.gameSetupBackground, 0, 0);
 
 		// Draw the currently selected game mode
@@ -337,19 +384,19 @@ public class GameSetupScreen extends Screen
 		if (match.numMirrors == 1)
 			g.drawPixmap(Assets.singleDigitSelect,
 					67 - Assets.singleDigitSelect.getWidth() / 2,
-					368 - Assets.singleDigitSelect.getHeight() / 2);
+					366 - Assets.singleDigitSelect.getHeight() / 2);
 		else if (match.numMirrors == 2)
 			g.drawPixmap(Assets.singleDigitSelect,
 					153 - Assets.singleDigitSelect.getWidth() / 2,
-					368 - Assets.singleDigitSelect.getHeight() / 2);
+					366 - Assets.singleDigitSelect.getHeight() / 2);
 		else if (match.numMirrors == 3)
 			g.drawPixmap(Assets.doubleDigitSelect,
 					251 - Assets.doubleDigitSelect.getWidth() / 2,
-					365 - Assets.doubleDigitSelect.getHeight() / 2);
+					366 - Assets.doubleDigitSelect.getHeight() / 2);
 		else
 			g.drawPixmap(Assets.mixedSelect,
 					385 - Assets.mixedSelect.getWidth() / 2,
-					365 - Assets.mixedSelect.getHeight() / 2);
+					366 - Assets.mixedSelect.getHeight() / 2);
 
 		// Draws the currently selected turn length
 		if (match.turnLength == 15)
@@ -404,6 +451,8 @@ public class GameSetupScreen extends Screen
 	 */
 	public void dispose()
 	{
+		if (startingGame)
+		{
 		game.disposeImage(Assets.gameSetupBackground);
 		game.disposeImage(Assets.mode2PlayerSel);
 		game.disposeImage(Assets.singleDigitSelect);
@@ -415,5 +464,24 @@ public class GameSetupScreen extends Screen
 
 		game.disposeImage(Assets.leftButtonNor);
 		game.disposeImage(Assets.leftButtonClck);
+		
+		game.disposeImage(Assets.mainMenuBackground);
+
+		game.disposeImage(Assets.playGameButtonNor);
+		game.disposeImage(Assets.playGameButtonClck);
+
+		game.disposeImage(Assets.instructionsButtonNor);
+		game.disposeImage(Assets.instructionsButtonClck);
+
+		game.disposeImage(Assets.aboutButtonNor);
+		game.disposeImage(Assets.aboutButtonClck);
+
+		game.disposeImage(Assets.exitButtonNor);
+		game.disposeImage(Assets.exitButtonClck);
+
+		game.disposeImage(Assets.aboutBackButtonNor);
+		game.disposeImage(Assets.aboutBackButtonClck);
+		game.disposeImage(Assets.aboutBackground);
+		}
 	}
 }
