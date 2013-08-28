@@ -70,11 +70,11 @@ public class InstructionsScreen extends Screen
 		if (!loaded)
 		{
 			loaded = true;
-			rightButton = new Button(313, 733, Assets.rightButtonNor,
+			rightButton = new Button(326, 733, Assets.rightButtonNor,
 					Assets.rightButtonClck);
-			leftButton = new Button(83, 733, Assets.leftButtonNor,
+			leftButton = new Button(70, 733, Assets.leftButtonNor,
 					Assets.leftButtonClck);
-			menuButton = new Button(181, 736, Assets.instMenuButtonNor,
+			menuButton = new Button(181, 734, Assets.instMenuButtonNor,
 					Assets.instMenuButtonClck);
 		}
 		// If the graphics have finished then checks through the touch events

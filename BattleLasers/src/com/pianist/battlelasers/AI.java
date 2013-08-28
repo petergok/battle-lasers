@@ -707,5 +707,20 @@ public class AI implements Runnable
 					|| (point.y == col + 1 && point.x == row)
 					|| (point.y == col && point.x == row + 1) || (point.y == col - 1 && point.x == row));
 		}
+		
+		/**
+		 * Checks if the mirror is equal to the given object
+		 * 
+		 * @param object
+		 *            The object to check the mirror against
+		 * @return true if the mirror is equal to the object, false if it isn't
+		 */
+		public boolean equals(Object object)
+		{
+			if (object == null)
+				return false;
+			AIMirror otherMirror = (AIMirror) object;
+			return (this.row == otherMirror.row && this.col == otherMirror.col);
+		}
 	}
 }

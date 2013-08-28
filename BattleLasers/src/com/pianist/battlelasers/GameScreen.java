@@ -246,7 +246,7 @@ public class GameScreen extends Screen
 		if (state == GameState.Animate)
 			return;
 
-		// Automatically switches turns 0.8 seconds afer winning
+		// Automatically switches turns 0.8 seconds after winning
 		if (state == GameState.Running)
 		{
 			if (shootLaser && timeSinceStart - laserDrawEnd > 0.8)
@@ -636,6 +636,7 @@ public class GameScreen extends Screen
 			laserStartTime = 0;
 			lastMoveStart = null;
 			lastMoveEnd = null;
+			letRelease = false;
 			clearMirrors();
 		}
 	}
