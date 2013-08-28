@@ -2,6 +2,8 @@ package com.pianist.battlelasers;
 
 import java.util.LinkedList;
 
+import com.pianist.battlelasers.AI.AIDifficulty;
+
 import android.graphics.Point;
 
 /**
@@ -34,7 +36,7 @@ public class Match
 
 	private boolean nextGameStarted;
 
-	public boolean isComputerDifficult;
+	public AIDifficulty computerDifficulty;
 
 	/**
 	 * Resets the match back to its initial parameters after the game is over,
@@ -63,7 +65,7 @@ public class Match
 		currentLayout = null;
 		gameNumber = 1;
 		nextGameStarted = true;
-		isComputerDifficult = false;
+		computerDifficulty = AIDifficulty.Easy;
 
 		// Create all the layouts in the game
 		layouts = new Layout[10];

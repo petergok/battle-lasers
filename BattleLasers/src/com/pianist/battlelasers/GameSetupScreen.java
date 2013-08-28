@@ -2,6 +2,7 @@ package com.pianist.battlelasers;
 
 import java.util.List;
 
+import com.pianist.battlelasers.AI.AIDifficulty;
 import com.pianist.battlelasers.Graphics.PixmapFormat;
 import com.pianist.battlelasers.Input.KeyEvent;
 import com.pianist.battlelasers.Input.TouchEvent;
@@ -251,14 +252,14 @@ public class GameSetupScreen extends Screen
 							Assets.mode1PlayerSel.getWidth(),
 							Assets.mode1PlayerSel.getHeight()))
 					{
-						match.isComputerDifficult = false;
+						match.computerDifficulty = AIDifficulty.Easy;
 						match.onePlayer = true;
 					}
 					else if (contained(nextEvent.x, nextEvent.y, 283, 217,
 							Assets.mode1PlayerSel.getWidth(),
 							Assets.mode1PlayerSel.getHeight()))
 					{
-						match.isComputerDifficult = true;
+						match.computerDifficulty = AIDifficulty.Impossible;
 						match.onePlayer = true;
 					}
 					else if (contained(nextEvent.x, nextEvent.y, 411, 217,
@@ -367,7 +368,7 @@ public class GameSetupScreen extends Screen
 
 		// Draw the currently selected game mode
 		if (match.onePlayer)
-			if (match.isComputerDifficult)
+			if (match.computerDifficulty == AIDifficulty.Impossible)
 				g.drawPixmap(Assets.mode1PlayerSel,
 						283 - Assets.mode1PlayerSel.getWidth() / 2,
 						217 - Assets.mode1PlayerSel.getHeight() / 2);

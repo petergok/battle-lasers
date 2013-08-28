@@ -41,7 +41,11 @@ public class AI implements Runnable
 	private ArrayList<ArrayList<AIMirror>> archivedGrids;
 
 	// Whether the AI is difficult or easy
-	private volatile boolean isDifficult;
+	private AIDifficulty difficulty;
+	
+	public enum AIDifficulty {
+		Easy, Medium, Hard, Impossible
+	}
 
 	/**
 	 * Creates a new AI with the given grid, list of mirrors and difficulty. It
@@ -52,11 +56,11 @@ public class AI implements Runnable
 	 *            The initial grid that contains the mirrors
 	 * @param mirrors
 	 *            The initial list that contains the mirrors
-	 * @param isDifficult
-	 *            Whether the AI is difficult or not
+	 * @param difficulty
+	 *            The difficulty of the AI
 	 */
 	public AI(final Mirror[][] grid, final List<Mirror> mirrors,
-			boolean isDifficult)
+			AIDifficulty difficulty)
 	{
 		// Copy over the mirror information
 		originalGrid = new AIMirror[12][8];
@@ -76,7 +80,7 @@ public class AI implements Runnable
 		illegalStart = null;
 		illegalEnd = null;
 		archivedGrids = new ArrayList<ArrayList<AIMirror>>();
-		this.isDifficult = isDifficult;
+		this.difficulty = difficulty;
 
 		// Add the first grid to the archived grids
 		ArrayList<AIMirror> saveGrid = new ArrayList<AIMirror>(
@@ -176,11 +180,24 @@ public class AI implements Runnable
 					{
 						selectedMove = foundMove;
 						isFinishedCalculating = true;
+						return;
 					}
 				}
 			}
 			catch (InterruptedException e)
 			{
+			}
+		}
+
+		// If the thread was interrupted, don't update the chosen move
+		// so it isn't used
+		if (!Thread.currentThread().isInterrupted())
+		{
+			synchronized (this)
+			{
+				selectedMove = foundMove;
+				isFinishedCalculating = true;
+				return;
 			}
 		}
 
@@ -269,7 +286,7 @@ public class AI implements Runnable
 		for (Move move : possibleMoves)
 		{
 			makeMove(gridCopy, move);
-			if (isDifficult)
+			if (difficulty == AIDifficulty.Impossible)
 			{
 				if (!usedGrid(listCopy)
 						&& !(testGrid(gridCopy, true, true) >= 0 || testGrid(
@@ -290,7 +307,7 @@ public class AI implements Runnable
 		}
 
 		// If the AI is set to easy, then it makes a random move 30% of the time
-		if (filteredMoves.isEmpty() || (!isDifficult && Math.random() >= 0.7))
+		if (filteredMoves.isEmpty() || (difficulty == AIDifficulty.Easy && Math.random() >= 0.7))
 			return randomMove;
 
 		// Finds the best move as defined by the AI winning after moving
@@ -317,7 +334,7 @@ public class AI implements Runnable
 
 		// If a best move wasn't found and the AI is set to difficult, recurse
 		// one move depth to look 2 moves ahead
-		if (isDifficult && depth < 2)
+		if (difficulty == AIDifficulty.Impossible && depth < 2)
 		{
 			for (Move move : filteredMoves)
 			{
@@ -408,7 +425,8 @@ public class AI implements Runnable
 	 *            Whether it is player one's turn
 	 * @param turnedRight
 	 *            Whether the player is shooting right (from their perspective)
-	 * @return
+	 * @return -1 if it is not a winning shot or a positive integer representing
+	 *         the length of the winning shot
 	 */
 	private int testGrid(AIMirror[][] grid, boolean playerOneTurn,
 			boolean turnedRight)
@@ -707,7 +725,7 @@ public class AI implements Runnable
 					|| (point.y == col + 1 && point.x == row)
 					|| (point.y == col && point.x == row + 1) || (point.y == col - 1 && point.x == row));
 		}
-		
+
 		/**
 		 * Checks if the mirror is equal to the given object
 		 * 
@@ -720,7 +738,7 @@ public class AI implements Runnable
 			if (object == null)
 				return false;
 			AIMirror otherMirror = (AIMirror) object;
-			return (this.row == otherMirror.row && this.col == otherMirror.col);
+			return (this.row == otherMirror.row && this.col == otherMirror.col && this.isHorizontal == otherMirror.isHorizontal);
 		}
 	}
 }

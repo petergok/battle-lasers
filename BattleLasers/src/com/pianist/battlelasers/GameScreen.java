@@ -155,7 +155,7 @@ public class GameScreen extends Screen
 
 		// If the match is a one player game, load the AI
 		if (match.onePlayer)
-			computerPlayer = new AI(grid, mirrors, match.isComputerDifficult);
+			computerPlayer = new AI(grid, mirrors, match.computerDifficulty);
 
 		// Create the two laser guns
 		playerTwo = new LaserGun(0, 3, true);

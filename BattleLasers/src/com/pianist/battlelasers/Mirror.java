@@ -212,6 +212,6 @@ public class Mirror
 		if (object == null)
 			return false;
 		Mirror otherMirror = (Mirror) object;
-		return (this.row == otherMirror.row && this.col == otherMirror.col);
+		return (this.row == otherMirror.row && this.col == otherMirror.col && this.isHorizontal() == otherMirror.isHorizontal());
 	}
 }
