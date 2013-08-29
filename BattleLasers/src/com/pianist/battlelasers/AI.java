@@ -257,8 +257,8 @@ public class AI implements Runnable
 		// that move based on the AI's difficulty level
 		// In later depths this case is checked beforehand
 		if (depth == 1
-				&& (Math.random() >= 0.5 || difficulty != AIDifficulty.Easy)
-				&& (Math.random() >= 0.25 || difficulty != AIDifficulty.Medium))
+				&& (Math.random() >= 0.4 || difficulty != AIDifficulty.Easy)
+				&& (Math.random() >= 0.15 || difficulty != AIDifficulty.Medium))
 		{
 			if (testGrid(gridCopy, false, false) >= 0)
 			{
@@ -286,7 +286,7 @@ public class AI implements Runnable
 					|| difficulty == AIDifficulty.Medium)
 				thinkLong = true;
 			else if (difficulty == AIDifficulty.Hard)
-				thinkLong = Math.random() > 0.5 + bonus;
+				thinkLong = Math.random() >= 0.5 + bonus;
 		}
 
 		// Generate a list of all possible moves
@@ -331,7 +331,7 @@ public class AI implements Runnable
 		if (!humanCanWin)
 		{
 			if (difficulty == AIDifficulty.Easy
-					|| (Math.random() >= 0.75 && difficulty == AIDifficulty.Medium))
+					|| (Math.random() >= 0.5 && difficulty == AIDifficulty.Medium))
 				return randomMove;
 		}
 
@@ -356,10 +356,10 @@ public class AI implements Runnable
 		// the difficulties
 		if (humanCanWin)
 		{
-			if (difficulty == AIDifficulty.Easy && Math.random() >= 0.5 + bonus)
+			if (difficulty == AIDifficulty.Easy && Math.random() >= 0.3 + bonus)
 				return randomMove;
 			if (difficulty == AIDifficulty.Medium
-					&& Math.random() >= 0.8 + bonus)
+					&& Math.random() >= 0.7 + bonus)
 				return randomMove;
 		}
 
