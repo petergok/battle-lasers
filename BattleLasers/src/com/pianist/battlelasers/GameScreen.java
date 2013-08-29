@@ -568,6 +568,7 @@ public class GameScreen extends Screen
 				Move computerMove = computerPlayer.getMove();
 				computerPlayer.userMadeMove(computerMove, false);
 				makeMove(computerMove);
+				computerPlayer.checkAIWin();
 			}
 		}
 

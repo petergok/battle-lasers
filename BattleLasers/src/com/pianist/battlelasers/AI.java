@@ -37,12 +37,18 @@ public class AI implements Runnable
 
 	private volatile Point illegalEnd;
 
+	// Whether the AI should pretend to think for a long time or not
+	private boolean thinkLong;
+
 	// The lists of mirrors that describe previously used grids
 	private ArrayList<ArrayList<AIMirror>> archivedGrids;
 
 	// Whether the AI is difficult or easy
 	private AIDifficulty difficulty;
-	
+
+	// Whether the AI could win after the last move
+	private boolean computerCouldWin;
+
 	public enum AIDifficulty {
 		Easy, Medium, Hard, Impossible
 	}
@@ -76,9 +82,11 @@ public class AI implements Runnable
 		// Initialise other variables to default
 		isFinishedCalculating = false;
 		selectedMove = new Move(null, null);
+		thinkLong = false;
 		calculationThread = null;
 		illegalStart = null;
 		illegalEnd = null;
+		computerCouldWin = false;
 		archivedGrids = new ArrayList<ArrayList<AIMirror>>();
 		this.difficulty = difficulty;
 
@@ -139,6 +147,18 @@ public class AI implements Runnable
 	}
 
 	/**
+	 * Checks if the AI could win after its last turn and stores it
+	 */
+	public void checkAIWin()
+	{
+		if (testGrid(originalGrid, false, false) >= 0
+				|| testGrid(originalGrid, false, true) >= 0)
+			computerCouldWin = true;
+		else
+			computerCouldWin = false;
+	}
+
+	/**
 	 * Tells the AI to start calculating a new move along with the last move
 	 * which it isn't allowed to undo
 	 * 
@@ -151,6 +171,7 @@ public class AI implements Runnable
 	{
 		this.illegalStart = illegalStart;
 		this.illegalEnd = illegalEnd;
+		thinkLong = false;
 		isFinishedCalculating = false;
 		if (calculationThread != null)
 			calculationThread.interrupt();
@@ -165,7 +186,8 @@ public class AI implements Runnable
 	{
 		long startTime = System.currentTimeMillis();
 		Move foundMove = findMove(originalGrid, originalList, 1);
-		int thinkingLength = (int) (Math.random() * 2000 + 1);
+		int thinkingLength = thinkLong ? 2000
+				: (int) (Math.random() * 2000 + 1);
 		if (System.currentTimeMillis() - startTime < thinkingLength)
 		{
 			try
@@ -232,9 +254,11 @@ public class AI implements Runnable
 		}
 
 		// If the recursion depth is one, check if the AI can win and return
-		// that move
+		// that move based on the AI's difficulty level
 		// In later depths this case is checked beforehand
-		if (depth == 1)
+		if (depth == 1
+				&& (Math.random() >= 0.5 || difficulty != AIDifficulty.Easy)
+				&& (Math.random() >= 0.25 || difficulty != AIDifficulty.Medium))
 		{
 			if (testGrid(gridCopy, false, false) >= 0)
 			{
@@ -244,6 +268,25 @@ public class AI implements Runnable
 			{
 				return new Move(null, null).needToTurnRight();
 			}
+		}
+
+		// Check if the human player can win
+		boolean humanCanWin = (testGrid(gridCopy, true, false) >= 0 || testGrid(
+				gridCopy, true, true) >= 0);
+
+		// If the player made a move after the computer could win and can now
+		// win the next turn, give them a luck bonus to reward them
+		double bonus = (computerCouldWin && humanCanWin) ? -0.5 : 0.0;
+
+		// If the player can win, reward them by making it seem as if the AI is
+		// taking longer to think
+		if (humanCanWin)
+		{
+			if (difficulty == AIDifficulty.Easy
+					|| difficulty == AIDifficulty.Medium)
+				thinkLong = true;
+			else if (difficulty == AIDifficulty.Hard)
+				thinkLong = Math.random() > 0.5 + bonus;
 		}
 
 		// Generate a list of all possible moves
@@ -280,34 +323,48 @@ public class AI implements Runnable
 		Move randomMove = possibleMoves
 				.get((int) (Math.random() * possibleMoves.size()));
 
+		// If the AI is in easy mode, always make a random move unless the
+		// computer can win, and if the AI is in medium mode, it only makes a
+		// random move 25% of the time.
+		// However, this rule only applies if the human player cannot win the
+		// next turn
+		if (!humanCanWin)
+		{
+			if (difficulty == AIDifficulty.Easy
+					|| (Math.random() >= 0.75 && difficulty == AIDifficulty.Medium))
+				return randomMove;
+		}
+
 		// Filter out all the moves that lead to an opponent winning or that
 		// lead to grids that have already been used
+		// Only the impossible AI makes moves that make sure the opponent cannot
+		// win because of an unlucky move (all other difficulties ignore the
+		// next opponents turn unless they can win using the current game state)
 		ArrayList<Move> filteredMoves = new ArrayList<Move>();
 		for (Move move : possibleMoves)
 		{
 			makeMove(gridCopy, move);
-			if (difficulty == AIDifficulty.Impossible)
-			{
-				if (!usedGrid(listCopy)
-						&& !(testGrid(gridCopy, true, true) >= 0 || testGrid(
-								gridCopy, true, false) >= 0))
-					filteredMoves.add(move);
-			}
-			else
-			{
-				// If the AI is set to easy mode, filter out any winning moves
-				// where the laser shot is longer than 20 segments
-				int firstValue = testGrid(gridCopy, true, true);
-				int secondValue = testGrid(gridCopy, true, false);
-				if (!usedGrid(listCopy)
-						&& !((firstValue < 20 && firstValue >= 0) || (secondValue < 20 && secondValue >= 0)))
-					filteredMoves.add(move);
-			}
+			if (!usedGrid(listCopy)
+					&& (difficulty != AIDifficulty.Impossible || !(testGrid(
+							gridCopy, true, true) >= 0 || testGrid(gridCopy,
+							true, false) >= 0)))
+				filteredMoves.add(move);
 			makeMove(gridCopy, move.reverse());
 		}
 
-		// If the AI is set to easy, then it makes a random move 30% of the time
-		if (filteredMoves.isEmpty() || (difficulty == AIDifficulty.Easy && Math.random() >= 0.7))
+		// If the human player can win, slightly alter the random move rate for
+		// the difficulties
+		if (humanCanWin)
+		{
+			if (difficulty == AIDifficulty.Easy && Math.random() >= 0.5 + bonus)
+				return randomMove;
+			if (difficulty == AIDifficulty.Medium
+					&& Math.random() >= 0.8 + bonus)
+				return randomMove;
+		}
+
+		// If there are no such possible moves, just make a random move
+		if (filteredMoves.isEmpty())
 			return randomMove;
 
 		// Finds the best move as defined by the AI winning after moving
@@ -332,7 +389,7 @@ public class AI implements Runnable
 		if (bestMove != null)
 			return bestMove;
 
-		// If a best move wasn't found and the AI is set to difficult, recurse
+		// If a best move wasn't found and the AI is set to impossible, recurse
 		// one move depth to look 2 moves ahead
 		if (difficulty == AIDifficulty.Impossible && depth < 2)
 		{
