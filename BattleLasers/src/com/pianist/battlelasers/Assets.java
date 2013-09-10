@@ -173,12 +173,6 @@ public class Assets
 
 	public static Pixmap closeButtonClck;
 
-	public static Pixmap gameSetupBackground;
-
-	public static Pixmap mode2PlayerSel;
-
-	public static Pixmap mode1PlayerSel;
-
 	public static Pixmap singleDigitSelect;
 
 	public static Pixmap doubleDigitSelect;
@@ -226,4 +220,16 @@ public class Assets
 	public static Pixmap aboutBackButtonClck;
 
 	public static Pixmap aboutBackButtonNor;
+	
+	public static Pixmap mediumModeSelect;
+	
+	public static Pixmap easyModeSelect;
+	
+	public static Pixmap onOffSelect;
+	
+	public static Pixmap singleSetupBackground;
+	
+	public static Pixmap onSetupBackground;
+	
+	public static Pixmap offSetupBackground;
 }

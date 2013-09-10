@@ -200,8 +200,8 @@ public class GameScreen extends Screen
 		// Update the time variables based on game state
 		timeSinceStart += deltaTime;
 		laserStartTime += deltaTime;
-		if (freezeTime || state == GameState.TapToStart || shootLaser
-				|| showMenu)
+		if (!match.timerOn || freezeTime || state == GameState.TapToStart
+				|| shootLaser || showMenu)
 		{
 			turnStart += deltaTime;
 		}
@@ -2087,7 +2087,8 @@ public class GameScreen extends Screen
 		// Change turns
 		playerOneTurn = !playerOneTurn;
 
-		// Update the AI's grid and tell it to start calculating the next move if it is its turn
+		// Update the AI's grid and tell it to start calculating the next move
+		// if it is its turn
 		if (match.onePlayer)
 			computerPlayer.userMadeMove(lastMove.reverse(), true);
 		if (match.onePlayer && !playerOneTurn)
@@ -2114,7 +2115,8 @@ public class GameScreen extends Screen
 		// If it is the AI's turn, tell it to start calculating
 		if (match.onePlayer && !playerOneTurn)
 		{
-			computerPlayer.userMadeMove(new Move(lastMoveStart, lastMoveEnd), false);
+			computerPlayer.userMadeMove(new Move(lastMoveStart, lastMoveEnd),
+					false);
 			computerPlayer.startCalculatingMove(lastMoveStart, lastMoveEnd);
 		}
 	}
@@ -2427,7 +2429,8 @@ public class GameScreen extends Screen
 		g.drawPixmap(Assets.target, 243 - Assets.target.getWidth() / 2,
 				438 - Assets.target.getHeight() / 2);
 
-		g.drawPixmap(Assets.timerBar, 22, 778);
+		if (match.timerOn)
+			g.drawPixmap(Assets.timerBar, 22, 778);
 
 		// Change game states if the animation is finished
 		if (timeSinceStart >= 1.3)
@@ -2579,21 +2582,24 @@ public class GameScreen extends Screen
 		undoButton.draw(g);
 
 		// Draw the timer bar based on whose turn it is
-		if (!playerOneTurn)
+		if (match.timerOn)
 		{
-			g.drawPixmap(Assets.timerBar, 22, 75, 448 - (int) Math.max(18,
-					(turnLength - (timeSinceStart - turnStart)) * 427
-							/ turnLength + 18), 0, (int) Math.max(18,
-					(turnLength - (timeSinceStart - turnStart)) * 427
-							/ turnLength + 18), Assets.timerBar.getHeight());
-		}
-		else
-		{
-			g.drawPixmap(Assets.timerBar, 22, 778, 448 - (int) Math.max(18,
-					(turnLength - (timeSinceStart - turnStart)) * 427
-							/ turnLength + 18), 0, (int) Math.max(18,
-					(turnLength - (timeSinceStart - turnStart)) * 427
-							/ turnLength + 18), Assets.timerBar.getHeight());
+			if (!playerOneTurn)
+			{
+				g.drawPixmap(Assets.timerBar, 22, 75, 448 - (int) Math.max(18,
+						(turnLength - (timeSinceStart - turnStart)) * 427
+								/ turnLength + 18), 0, (int) Math.max(18,
+						(turnLength - (timeSinceStart - turnStart)) * 427
+								/ turnLength + 18), Assets.timerBar.getHeight());
+			}
+			else
+			{
+				g.drawPixmap(Assets.timerBar, 22, 778, 448 - (int) Math.max(18,
+						(turnLength - (timeSinceStart - turnStart)) * 427
+								/ turnLength + 18), 0, (int) Math.max(18,
+						(turnLength - (timeSinceStart - turnStart)) * 427
+								/ turnLength + 18), Assets.timerBar.getHeight());
+			}
 		}
 	}
 

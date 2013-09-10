@@ -227,12 +227,20 @@ public class MainMenuScreen extends Screen
 				Assets.background = g.newPixmap("Background.png",
 						PixmapFormat.ARGB4444);
 
-				Assets.gameSetupBackground = g.newPixmap("GameSetupScreen.png",
+				Assets.singleSetupBackground = g.newPixmap("SingleGameSetupScreen.png",
 						PixmapFormat.ARGB4444);
-				Assets.mode2PlayerSel = g.newPixmap("DoubleDigitSelect.png",
+				Assets.onSetupBackground = g.newPixmap("GameSetupScreenOn.png",
 						PixmapFormat.ARGB4444);
-				Assets.mode1PlayerSel = g.newPixmap("1PlayerSelect.png",
+				Assets.offSetupBackground = g.newPixmap("GameSetupScreenOff.png",
 						PixmapFormat.ARGB4444);
+				
+				Assets.easyModeSelect = g.newPixmap("EasyModeSelect.png",
+						PixmapFormat.ARGB4444);
+				Assets.mediumModeSelect = g.newPixmap("MediumModeSelect.png",
+						PixmapFormat.ARGB4444);
+				Assets.onOffSelect = g.newPixmap("OnOffSelect.png",
+						PixmapFormat.ARGB4444);
+
 				Assets.singleDigitSelect = g.newPixmap("SingleDigitSelect.png",
 						PixmapFormat.ARGB4444);
 				Assets.doubleDigitSelect = g.newPixmap("DoubleDigitSelect.png",

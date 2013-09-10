@@ -19,6 +19,8 @@ public class Match
 	public boolean onePlayer;
 
 	public int numGames;
+	
+	public boolean timerOn;
 
 	public int numMirrors;
 
@@ -66,6 +68,7 @@ public class Match
 		gameNumber = 1;
 		nextGameStarted = true;
 		computerDifficulty = AIDifficulty.Easy;
+		timerOn = true;
 
 		// Create all the layouts in the game
 		layouts = new Layout[10];

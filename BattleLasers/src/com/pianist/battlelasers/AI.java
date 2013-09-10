@@ -325,7 +325,7 @@ public class AI implements Runnable
 
 		// If the AI is in easy mode, always make a random move unless the
 		// computer can win, and if the AI is in medium mode, it only makes a
-		// random move 25% of the time.
+		// random move 50% of the time.
 		// However, this rule only applies if the human player cannot win the
 		// next turn
 		if (!humanCanWin)
