@@ -24,6 +24,7 @@ public class GameSetupScreen extends Screen
 	// Whether to load the game scren images
 	boolean loadImages;
 	
+	// If the game is being started
 	boolean startingGame;
 
 	// Store the buttons
@@ -229,7 +230,7 @@ public class GameSetupScreen extends Screen
 			List<KeyEvent> keyEvents = game.getInput().getKeyEvents();
 			if (keyEvents.size() > 0 && keyEvents.get(0).type == KeyEvent.KEY_UP && keyEvents.get(0).keyCode == android.view.KeyEvent.KEYCODE_BACK)
 			{
-				Screen nextScreen = new MainMenuScreen (game, false, match);
+				Screen nextScreen = new GameModeScreen (game, match);
 				game.setScreen(nextScreen);
 			}
 			
@@ -322,7 +323,7 @@ public class GameSetupScreen extends Screen
 			}
 			else if (leftButton.wasReleased())
 			{
-				Screen screen = new MainMenuScreen(game, false, match);
+				Screen screen = new GameModeScreen(game, match);
 				game.setScreen(screen);
 			}
 		}

@@ -17,6 +17,24 @@ public class Assets
 
 	public static Pixmap instMenuButtonClck;
 	
+	public static Pixmap singleButtonNor;
+	
+	public static Pixmap singleButtonClck;
+	
+	public static Pixmap onlineMultButtonNor;
+	
+	public static Pixmap onlineMultButtonClck;
+	
+	public static Pixmap localMultButtonNor;
+	
+	public static Pixmap localMultButtonClck;
+	
+	public static Pixmap puzzleButtonNor;
+	
+	public static Pixmap puzzleButtonClck;
+	
+	public static Pixmap gameModeBackground;
+	
 	public static Pixmap background;
 
 	public static Pixmap undoButtonNor;

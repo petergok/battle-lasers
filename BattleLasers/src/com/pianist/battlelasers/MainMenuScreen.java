@@ -83,8 +83,26 @@ public class MainMenuScreen extends Screen
 						PixmapFormat.ARGB4444);
 				Assets.undoButtonClck = g.newPixmap("UndoButtonClicked.png",
 						PixmapFormat.ARGB4444);
+				Assets.puzzleButtonNor = g.newPixmap("PuzzleButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.puzzleButtonClck = g.newPixmap("PuzzleButtonClicked.png",
+						PixmapFormat.ARGB4444);
+				Assets.singleButtonNor = g.newPixmap("SingleButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.singleButtonClck = g.newPixmap("SingleButtonClicked.png",
+						PixmapFormat.ARGB4444);
+				Assets.localMultButtonNor = g.newPixmap("LocalMulButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.localMultButtonClck = g.newPixmap("LocalMulButtonClicked.png",
+						PixmapFormat.ARGB4444);
+				Assets.onlineMultButtonNor = g.newPixmap("OnlineMulButtonNormal.png",
+						PixmapFormat.ARGB4444);
+				Assets.onlineMultButtonClck = g.newPixmap("OnlineMulButtonClicked.png",
+						PixmapFormat.ARGB4444);
 
 				Assets.gameBackground = g.newPixmap("GameBackground.png",
+						PixmapFormat.ARGB4444);
+				Assets.gameModeBackground = g.newPixmap("GameModeScreen.png",
 						PixmapFormat.ARGB4444);
 				Assets.gridHighlight = g.newPixmap("GridHighlight.png",
 						PixmapFormat.ARGB4444);
@@ -277,7 +295,7 @@ public class MainMenuScreen extends Screen
 			// Change screens or state based on what button was pressed
 			if (playGameButton.wasReleased())
 			{
-				Screen screen = new GameSetupScreen(game, false, match);
+				Screen screen = new GameModeScreen(game, match);
 				game.setScreen(screen);
 			}
 			if (instructionsButton.wasReleased())
