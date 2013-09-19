@@ -59,15 +59,15 @@ public class Match
 	public Match()
 	{
 		onePlayer = false;
-		numGames = 5;
-		numMirrors = 3;
+		numGames = 3;
+		numMirrors = 2;
 		turnLength = 30;
 		playerOneScore = 0;
 		playerTwoScore = 0;
 		currentLayout = null;
 		gameNumber = 1;
 		nextGameStarted = true;
-		computerDifficulty = AIDifficulty.Medium;
+		computerDifficulty = AIDifficulty.Easy;
 		timerOn = true;
 
 		// Create all the layouts in the game
@@ -98,15 +98,15 @@ public class Match
 		layouts[3] = new Layout(rows, cols, isHorizonal);
 
 		rows = new int[] { 4, 4, 5, 5, 6, 6, 7, 7 };
-		cols = new int[] { 2, 5, 2, 5, 2, 5, 2, 5 };
-		isHorizonal = new boolean[] { true, true, false, false, false, false,
-				true, true };
+		cols = new int[] { 2, 5, 3, 4, 3, 4, 2, 5 };
+		isHorizonal = new boolean[] { false, false, false, true, true, false,
+				false, false };
 		layouts[4] = new Layout(rows, cols, isHorizonal);
 
 		rows = new int[] { 4, 4, 5, 5, 6, 6, 7, 7 };
 		cols = new int[] { 2, 5, 3, 4, 3, 4, 2, 5 };
-		isHorizonal = new boolean[] { true, true, false, false, false, false,
-				true, true };
+		isHorizonal = new boolean[] { false, false, false, false, false, false,
+				false, false };
 		layouts[5] = new Layout(rows, cols, isHorizonal);
 
 		// 12 Mirrors
