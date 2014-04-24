@@ -85,6 +85,8 @@ public class BattleLaserGame extends Activity
 		input = new Input(this, renderView, scaleX, scaleY);
 		screen = new MainMenuScreen(this, true, new Match());
 		setContentView(renderView);
+		
+		BLSocketIOWrapper.connectTo("http://peaceful-plateau-5934.herokuapp.com:8080");
 	}
 
 	/**
