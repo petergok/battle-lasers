@@ -128,6 +128,8 @@ public class BattleLaserGame extends Activity
 
             if (regid.isEmpty()) {
                 registerInBackground();
+            } else {
+            	sendRegistrationIdToBackend();
             }
 	    	
 	    } else {
@@ -238,8 +240,7 @@ public class BattleLaserGame extends Activity
 	 * using the 'from' address in the message.
 	 */
 	private void sendRegistrationIdToBackend() {
-		String esn = ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
-	    new SendRegistrationIdTask("http://mysterious-wave-3427.herokuapp.com/registrationId?registrationId=" + regid + "&esn=" + esn).execute();
+		new SendRegistrationIdTask("http://mysterious-wave-3427.herokuapp.com/player?registrationId=" + regid + "&rating=" + 1000).execute();
 	}
 	
 	/**
