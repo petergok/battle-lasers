@@ -16,6 +16,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -237,7 +238,8 @@ public class BattleLaserGame extends Activity
 	 * using the 'from' address in the message.
 	 */
 	private void sendRegistrationIdToBackend() {
-	    new SendRegistrationIdTask("http://mysterious-wave-3427.herokuapp.com/registrationId?registrationID=" + regid).execute();
+		String esn = ((TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
+	    new SendRegistrationIdTask("http://mysterious-wave-3427.herokuapp.com/registrationId?registrationId=" + regid + "&esn=" + esn).execute();
 	}
 	
 	/**

@@ -28,7 +28,7 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
 	{
 		HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
-        String responseString = null;
+        String responseString = "none";
         try {
             response = httpclient.execute(new HttpPut(mUri));
             StatusLine statusLine = response.getStatusLine();
