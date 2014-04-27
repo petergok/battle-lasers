@@ -183,6 +183,10 @@ public class Match
 			}
 		}
 	}
+	
+	public Layout getLayout(int id){
+		return layouts[id];
+	}
 
 	/**
 	 * An inner class that keeps track of the different possible mirror layouts

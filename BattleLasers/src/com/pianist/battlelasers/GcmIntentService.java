@@ -1,11 +1,15 @@
 package com.pianist.battlelasers;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 public class GcmIntentService extends IntentService {
@@ -14,6 +18,7 @@ public class GcmIntentService extends IntentService {
 	
     public static final int NOTIFICATION_ID = 1;
     NotificationCompat.Builder builder;
+    BattleLaserGame game;
 
     public GcmIntentService() {
         super(BattleLaserGame.SENDER_ID);
@@ -45,7 +50,28 @@ public class GcmIntentService extends IntentService {
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 // Post notification of received message.
                 Log.d(TAG, "Received: " + extras.toString());
+                parseAndReportMessage(extras);
             }
         }
+    }
+    
+    private void parseAndReportMessage(Bundle data) {
+    	try {
+    		
+    		String messageType = data.getString("messageType");
+    		if (messageType != null && messageType.equals("startMatch")) {
+    			String otherPlayerName = data.getString("otherPlayerName");
+    			boolean myTurn = data.getBoolean("yourTurn");
+    			int mapId = data.getInt("mapId");
+    			Intent RTRetur = new Intent(BattleLaserGame.MATCH_STARTED);
+    			RTRetur.putExtra("otherPlayerName", otherPlayerName);
+    			RTRetur.putExtra("myTurn", myTurn);
+    			RTRetur.putExtra("mapId", mapId);
+    			LocalBroadcastManager.getInstance(this).sendBroadcast(RTRetur);
+    		}
+    		
+    	} catch (Exception e) {
+    		
+    	}
     }
 }

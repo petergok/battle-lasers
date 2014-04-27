@@ -9,13 +9,18 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Window;
@@ -68,12 +73,29 @@ public class BattleLaserGame extends Activity
     public static String SENDER_ID = "237835227996";
 	
 	// GCM service variables
-	GoogleCloudMessaging gcm;
-	String regid;
-	
+	private GoogleCloudMessaging gcm;
+	private String regid;
 	
 	// Context
-	Context mContext;
+	private Context mContext;
+	
+	private ProgressDialog mProgressDialog;
+	
+	public static final String MATCH_STARTED = "com.pianist.battlelasers.MATCH_STARTED";
+	
+	private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+	    @Override
+	    public void onReceive(Context context, Intent intent) {
+	        if(intent.getAction().equals(MATCH_STARTED)) {
+	        	String otherPlayerName = intent.getStringExtra("otherPlayerName");
+	        	boolean myTurn = intent.getBooleanExtra("myTurn", false);
+	        	int mapId = intent.getIntExtra("mapId", 1);
+	        	if (screen instanceof MultiSetupScreen) {
+	    			((MultiSetupScreen) screen).createdMatch(otherPlayerName, mapId, myTurn);
+	    		}
+	        }
+	    }
+	};
 
 	/**
 	 * The main method that gets called on creation of the activity. It
@@ -119,6 +141,13 @@ public class BattleLaserGame extends Activity
 		
 		mContext = getApplicationContext();
 		
+		LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(MATCH_STARTED);
+		bManager.registerReceiver(bReceiver, intentFilter);
+	}
+	
+	public void registerGCM() {
 		// Check device for Play Services APK.
 	    if (checkPlayServices()) {
 	        // If this check succeeds, proceed with normal processing.
@@ -206,23 +235,12 @@ public class BattleLaserGame extends Activity
 	                regid = gcm.register(SENDER_ID);
 	                msg = "Device registered, registration ID=" + regid;
 
-	                // You should send the registration ID to your server over HTTP,
-	                // so it can use GCM/HTTP or CCS to send messages to your app.
-	                // The request to your server should be authenticated if your app
-	                // is using accounts.
 	                sendRegistrationIdToBackend();
-
-	                // For this demo: we don't need to send it because the device
-	                // will send upstream messages to a server that echo back the
-	                // message using the 'from' address in the message.
 
 	                // Persist the regID - no need to register again.
 	                storeRegistrationId(mContext, regid);
 	            } catch (IOException ex) {
 	                msg = "Error :" + ex.getMessage();
-	                // If there is an error, don't just keep trying to register.
-	                // Require the user to click a button again, or perform
-	                // exponential back-off.
 	            }
 	            return msg;
 	        }
@@ -240,7 +258,7 @@ public class BattleLaserGame extends Activity
 	 * using the 'from' address in the message.
 	 */
 	private void sendRegistrationIdToBackend() {
-		new SendRegistrationIdTask("http://mysterious-wave-3427.herokuapp.com/player?registrationId=" + regid + "&rating=" + 1000).execute();
+		new SendRegistrationIdTask("http://mysterious-wave-3427.herokuapp.com/player?registrationId=" + regid + "&rating=" + 1000, this).execute();
 	}
 	
 	/**
@@ -375,4 +393,19 @@ public class BattleLaserGame extends Activity
 	    }
 	    return true;
 	}
+	
+	public void registeredUser(int userId) {
+		if (screen instanceof MultiSetupScreen) {
+			((MultiSetupScreen) screen).registeredUser(userId);
+		}
+	}
+	
+	public void showProgressDialog() {
+
+	}
+	
+	public void dismissProgressDialog() {
+	}
+	
+	
 }

@@ -12,15 +12,18 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
 {
 	String mUri;
+	BattleLaserGame mActivity;
 	
-	public SendRegistrationIdTask(String uri) {
+	public SendRegistrationIdTask(String uri, BattleLaserGame activity) {
 		mUri = uri;
+		this.mActivity = activity;
 	}
 	
 	@Override
@@ -53,7 +56,22 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
 	@Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
+        int id = getId(result);
+        if (id >= 0) {
+        	mActivity.registeredUser(id);
+        }
         Log.d("RESPONSE", result);
     }
+	
+	private static int getId(String s) {
+		int id = -1;
+	    try { 
+	        id = Integer.parseInt(s); 
+	    } catch(NumberFormatException e) { 
+	        return -1; 
+	    }
+	    // only got here if we didn't return false
+	    return id;
+	}
 }
 

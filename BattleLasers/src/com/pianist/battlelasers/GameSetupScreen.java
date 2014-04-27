@@ -19,21 +19,21 @@ import android.graphics.Color;
 public class GameSetupScreen extends Screen
 {
 	// Whether the images have been loaded yet
-	boolean loaded;
+	private boolean loaded;
 
 	// Whether to load the game scren images
-	boolean loadImages;
+	private boolean loadImages;
 
 	// If the game is being started
-	boolean startingGame;
+	private boolean startingGame;
 
 	// Store the buttons
-	Button leftButton;
+	private Button leftButton;
 
-	Button rightButton;
+	private Button rightButton;
 
 	// Store the match
-	Match match;
+	private Match match;
 
 	/**
 	 * Starts up the screen with the current game activity and match parameters
@@ -353,7 +353,7 @@ public class GameSetupScreen extends Screen
 			if (rightButton.wasReleased())
 			{
 				startingGame = true;
-				Screen screen = new GameScreen(game, match);
+				Screen screen = new GameScreen(game, match, true);
 				game.setScreen(screen);
 			}
 			else if (leftButton.wasReleased())

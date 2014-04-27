@@ -130,7 +130,7 @@ public class GameScreen extends Screen
 	 *            one player or two player, how long a turn is and how many
 	 *            mirrors are invovled
 	 */
-	public GameScreen(BattleLaserGame game, Match match)
+	public GameScreen(BattleLaserGame game, Match match, boolean newLayout)
 	{
 		super(game);
 
@@ -141,7 +141,12 @@ public class GameScreen extends Screen
 
 		// Gets the current match's mirror layout and loads it into the grid and
 		// list
-		Layout nextLayout = match.getNextLayout();
+		Layout nextLayout;
+		if (newLayout) {
+			nextLayout = match.getNextLayout();
+		} else {
+			nextLayout = match.currentLayout;
+		}
 		Point nextPoint;
 		while ((nextPoint = nextLayout.getNextPosition()) != null)
 		{
@@ -341,7 +346,7 @@ public class GameScreen extends Screen
 					}
 					else if (restartButton.wasReleased())
 					{
-						Screen newScreen = new GameScreen(game, match);
+						Screen newScreen = new GameScreen(game, match, true);
 						game.setScreen(newScreen);
 					}
 				}
@@ -372,7 +377,7 @@ public class GameScreen extends Screen
 						if (nextButton.wasReleased())
 						{
 							match.nextGame();
-							Screen nextScreen = new GameScreen(game, match);
+							Screen nextScreen = new GameScreen(game, match, true);
 							game.setScreen(nextScreen);
 						}
 					}
@@ -2756,6 +2761,10 @@ public class GameScreen extends Screen
 		{
 			presentMenu();
 		}
+	}
+	
+	public Match getMatch() {
+		return match;
 	}
 
 	/**
