@@ -130,7 +130,7 @@ public class GameScreen extends Screen
 	 *            one player or two player, how long a turn is and how many
 	 *            mirrors are invovled
 	 */
-	public GameScreen(BattleLaserGame game, Match match, boolean newLayout)
+	public GameScreen(BattleLaserGame game, Match match)
 	{
 		super(game);
 
@@ -142,9 +142,10 @@ public class GameScreen extends Screen
 		// Gets the current match's mirror layout and loads it into the grid and
 		// list
 		Layout nextLayout;
-		if (newLayout) {
+		if (match.isOnline) {
 			nextLayout = match.getNextLayout();
 		} else {
+			match.currentLayout.generatePositions();
 			nextLayout = match.currentLayout;
 		}
 		Point nextPoint;
@@ -173,7 +174,11 @@ public class GameScreen extends Screen
 				Assets.gameMenuButtonClck);
 
 		// Initialize other important variables to default
-		playerOneTurn = true;
+		if (match.isOnline && match.onlinePlayerNumber == 2) {
+			playerOneTurn = false;
+		} else {
+			playerOneTurn = true;
+		}
 		shootLaser = false;
 		timeSinceStart = 0;
 		laserStartTime = 0;
@@ -200,7 +205,7 @@ public class GameScreen extends Screen
 	 * @param detalTime
 	 *            The time since the last call of update
 	 */
-	public void update(float deltaTime)
+	public synchronized void update(float deltaTime)
 	{
 		// Update the time variables based on game state
 		timeSinceStart += deltaTime;
@@ -237,14 +242,7 @@ public class GameScreen extends Screen
 				laserDrawEnd = timeSinceStart;
 			}
 
-			if (showMenu)
-			{
-				disposeAnimationImages();
-				Screen nextScreen = new MainMenuScreen(game, true, match);
-				game.setScreen(nextScreen);
-			}
-			else
-				showMenu = true;
+			showMenu = !showMenu;
 			return;
 		}
 		// If the current state is animating, ignore other user input
@@ -264,7 +262,7 @@ public class GameScreen extends Screen
 
 		// If it is not the AI's turn, check if the player has held the gun long
 		// enough to shoot and shoot if they did
-		if (!match.onePlayer || playerOneTurn)
+		if ((!match.isOnline && !match.onePlayer) || playerOneTurn)
 		{
 			if (state == GameState.Running
 					&& ((playerOneTurn && playerOne.shoot(timeSinceStart)) || (!playerOneTurn && playerTwo
@@ -346,7 +344,7 @@ public class GameScreen extends Screen
 					}
 					else if (restartButton.wasReleased())
 					{
-						Screen newScreen = new GameScreen(game, match, true);
+						Screen newScreen = new GameScreen(game, match);
 						game.setScreen(newScreen);
 					}
 				}
@@ -377,7 +375,7 @@ public class GameScreen extends Screen
 						if (nextButton.wasReleased())
 						{
 							match.nextGame();
-							Screen nextScreen = new GameScreen(game, match, true);
+							Screen nextScreen = new GameScreen(game, match);
 							game.setScreen(nextScreen);
 						}
 					}
@@ -406,7 +404,7 @@ public class GameScreen extends Screen
 			// If the next event was a down press and it is not the Computer's
 			// turn
 			if (nextEvent.type == TouchEvent.TOUCH_DOWN
-					&& (!match.onePlayer || playerOneTurn))
+					&& ((!match.isOnline && !match.onePlayer) || playerOneTurn))
 			{
 				Point selectedPoint = getGridCoordinates(nextEvent.x,
 						nextEvent.y);
@@ -471,7 +469,7 @@ public class GameScreen extends Screen
 				}
 
 				// If it is not the AI's turn
-				if (!match.onePlayer || playerOneTurn)
+				if ((!match.isOnline && !match.onePlayer) || playerOneTurn)
 				{
 					Point selectedPoint = getGridCoordinates(nextEvent.x,
 							nextEvent.y);
@@ -2124,6 +2122,10 @@ public class GameScreen extends Screen
 					false);
 			computerPlayer.startCalculatingMove(lastMoveStart, lastMoveEnd);
 		}
+		else if (match.isOnline && !playerOneTurn)
+		{
+			
+		}
 	}
 
 	/**
@@ -2761,6 +2763,12 @@ public class GameScreen extends Screen
 		{
 			presentMenu();
 		}
+	}
+	
+	public synchronized void onlineMoveMade(Point start, Point end) {
+		Move move = new Move(start, end);
+		makeMove(move);
+		computerPlayer.checkAIWin();
 	}
 	
 	public Match getMatch() {

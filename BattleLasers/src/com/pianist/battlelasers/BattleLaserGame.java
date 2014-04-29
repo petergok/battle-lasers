@@ -60,11 +60,14 @@ public class BattleLaserGame extends Activity
 
 	int frameBufferHeight;
 	
+	private int mRating;
+	
 	// Play services resolution request
 	public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
-	private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+	private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+	public static final String BASE_URL = "http://mysterious-wave-3427.herokuapp.com";
 	
 	/**
      * Substitute you own sender ID here. This is the project number you got
@@ -79,20 +82,30 @@ public class BattleLaserGame extends Activity
 	// Context
 	private Context mContext;
 	
-	private ProgressDialog mProgressDialog;
+	// Preferences file
+	public static final String BATTLE_LASERS_PREFS = "battle_lasers_prefs";
 	
 	public static final String MATCH_STARTED = "com.pianist.battlelasers.MATCH_STARTED";
+	public static final String MOVE = "com.pinaist.battlelasers.MOVE";
+	
+	public static final String PREF_RATING = "pref_rating";
 	
 	private BroadcastReceiver bReceiver = new BroadcastReceiver() {
 	    @Override
 	    public void onReceive(Context context, Intent intent) {
 	        if(intent.getAction().equals(MATCH_STARTED)) {
 	        	String otherPlayerName = intent.getStringExtra("otherPlayerName");
-	        	boolean myTurn = intent.getBooleanExtra("myTurn", false);
+	        	int playerNumber = intent.getIntExtra("playerNumber", 0);
 	        	int mapId = intent.getIntExtra("mapId", 1);
 	        	if (screen instanceof MultiSetupScreen) {
-	    			((MultiSetupScreen) screen).createdMatch(otherPlayerName, mapId, myTurn);
+	    			((MultiSetupScreen) screen).createdMatch(otherPlayerName, mapId, playerNumber);
 	    		}
+	        } else if (intent.getAction().equals(MOVE)) {
+	        	Point moveStart = new Point(intent.getIntExtra("startX", -1), intent.getIntExtra("startY", -1));
+	        	Point moveEnd = new Point(intent.getIntExtra("endX", -1), intent.getIntExtra("endY", -1));
+	        	if (screen instanceof GameScreen) {
+	        		((GameScreen) screen).onlineMoveMade(moveStart, moveEnd);
+	        	}
 	        }
 	    }
 	};
@@ -141,9 +154,13 @@ public class BattleLaserGame extends Activity
 		
 		mContext = getApplicationContext();
 		
+		SharedPreferences settings = getSharedPreferences(BATTLE_LASERS_PREFS, 0);
+	    mRating = settings.getInt(PREF_RATING, 1000);
+		
 		LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(MATCH_STARTED);
+		intentFilter.addAction(MOVE);
 		bManager.registerReceiver(bReceiver, intentFilter);
 	}
 	
@@ -258,7 +275,7 @@ public class BattleLaserGame extends Activity
 	 * using the 'from' address in the message.
 	 */
 	private void sendRegistrationIdToBackend() {
-		new SendRegistrationIdTask("http://mysterious-wave-3427.herokuapp.com/player?registrationId=" + regid + "&rating=" + 1000, this).execute();
+		new SendRegistrationIdTask(this, regid, mRating).execute();
 	}
 	
 	/**

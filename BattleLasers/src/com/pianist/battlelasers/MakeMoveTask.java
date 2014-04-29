@@ -11,19 +11,20 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
+public class MakeMoveTask extends AsyncTask<Void, Void, String>
 {
-	private BattleLaserGame mActivity;
-	private String mRegId;
-	private int mRating;
+	private Point mLastMoveStart;
+	private Point mLastMoveEnd;
+	private int mPlayerId;
 	
-	public SendRegistrationIdTask(BattleLaserGame activity, String regId, int rating) {
-		mRegId = regId;
-		mRating = rating;
-		mActivity = activity;
+	public MakeMoveTask(Point lastMoveStart, Point lastMoveEnd, int playerId) {
+		mLastMoveStart = lastMoveStart;
+		mLastMoveEnd = lastMoveEnd;
+		mPlayerId = playerId;
 	}
 	
 	@Override
@@ -32,11 +33,13 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
 		HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = "none";
-        String uri = BattleLaserGame.BASE_URL + "/player";
+        String uri = BattleLaserGame.BASE_URL + "/player/" + mPlayerId + "/move";
         try {
         	HttpPut method = new HttpPut(uri);
-        	method.addHeader("registrationId", mRegId);
-        	method.addHeader("rating", mRating + "");
+        	method.addHeader("lastMoveStartX", "" + mLastMoveStart.x);
+        	method.addHeader("lastMoveStartY", "" + mLastMoveStart.y);
+        	method.addHeader("lastMoveEndX", "" + mLastMoveEnd.x);
+        	method.addHeader("lastMoveEndY", "" + mLastMoveEnd.y);
             response = httpclient.execute(method);
             StatusLine statusLine = response.getStatusLine();
             if(statusLine.getStatusCode() == HttpStatus.SC_OK){
@@ -60,22 +63,7 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
 	@Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        int id = getId(result);
-        if (id >= 0) {
-        	mActivity.registeredUser(id);
-        }
         Log.d("RESPONSE", result);
     }
-	
-	private static int getId(String s) {
-		int id = -1;
-	    try { 
-	        id = Integer.parseInt(s); 
-	    } catch(NumberFormatException e) { 
-	        return -1; 
-	    }
-	    // only got here if we didn't return false
-	    return id;
-	}
 }
 

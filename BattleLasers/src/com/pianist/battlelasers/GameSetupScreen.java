@@ -353,7 +353,7 @@ public class GameSetupScreen extends Screen
 			if (rightButton.wasReleased())
 			{
 				startingGame = true;
-				Screen screen = new GameScreen(game, match, true);
+				Screen screen = new GameScreen(game, match);
 				game.setScreen(screen);
 			}
 			else if (leftButton.wasReleased())

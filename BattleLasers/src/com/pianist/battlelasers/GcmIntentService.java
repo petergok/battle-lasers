@@ -59,15 +59,29 @@ public class GcmIntentService extends IntentService {
     	try {
     		
     		String messageType = data.getString("messageType");
-    		if (messageType != null && messageType.equals("startMatch")) {
+    		if (messageType == null) {
+    			return;
+    		}
+    		if (messageType.equals("startMatch")) {
     			String otherPlayerName = data.getString("otherPlayerName");
-    			boolean myTurn = data.getBoolean("yourTurn");
+    			int playerNumber = data.getInt("playerNumber");
     			int mapId = data.getInt("mapId");
-    			Intent RTRetur = new Intent(BattleLaserGame.MATCH_STARTED);
-    			RTRetur.putExtra("otherPlayerName", otherPlayerName);
-    			RTRetur.putExtra("myTurn", myTurn);
-    			RTRetur.putExtra("mapId", mapId);
-    			LocalBroadcastManager.getInstance(this).sendBroadcast(RTRetur);
+    			Intent intent = new Intent(BattleLaserGame.MATCH_STARTED);
+    			intent.putExtra("otherPlayerName", otherPlayerName);
+    			intent.putExtra("playerNumber", playerNumber);
+    			intent.putExtra("mapId", mapId);
+    			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    		} else if (messageType.equals("move")) {
+    			int startX = data.getInt("startX");
+    			int startY = data.getInt("startY");
+    			int endX = data.getInt("endX");
+    			int endY = data.getInt("endY");
+    			Intent intent = new Intent(BattleLaserGame.MOVE);
+    			intent.putExtra("startX", startX);
+    			intent.putExtra("startY", startY);
+    			intent.putExtra("endX", endX);
+    			intent.putExtra("endY", endY);
+    			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     		}
     		
     	} catch (Exception e) {

@@ -35,12 +35,12 @@ public class MultiSetupScreen extends Screen
 		mUserId = id;
 	}
 	
-	public void createdMatch(String otherPlayerName, int mapId, boolean isMyTurn) {
+	public void createdMatch(String otherPlayerName, int mapId, int playerNumber) {
 		game.dismissProgressDialog();
+		match.onlinePlayerNumber = playerNumber;
 		match.currentLayout = match.getLayout(mapId);
-		match.currentLayout.generatePositions();
 		startingGame = true;
-		Screen screen = new GameScreen(game, match, false);
+		Screen screen = new GameScreen(game, match);
 		game.setScreen(screen);
 	}
 

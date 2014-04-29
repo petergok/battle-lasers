@@ -17,6 +17,10 @@ import android.graphics.Point;
 public class Match
 {
 	public boolean onePlayer;
+	
+	public boolean isOnline;
+	
+	public int onlinePlayerNumber;
 
 	public int numGames;
 	
@@ -59,8 +63,10 @@ public class Match
 	public Match()
 	{
 		onePlayer = false;
+		isOnline = false;
+		onlinePlayerNumber = 0;
 		numGames = 3;
-		numMirrors = 2;
+		numMirrors = 4;
 		turnLength = 30;
 		playerOneScore = 0;
 		playerTwoScore = 0;
