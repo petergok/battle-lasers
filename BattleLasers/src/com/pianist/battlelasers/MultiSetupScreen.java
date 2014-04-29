@@ -37,8 +37,9 @@ public class MultiSetupScreen extends Screen
 	
 	public void createdMatch(String otherPlayerName, int mapId, int playerNumber) {
 		game.dismissProgressDialog();
-		match.onlinePlayerNumber = 3 - playerNumber;
+		match.playerNumberForOnline = playerNumber;
 		match.currentLayout = match.getLayout(mapId);
+		match.onlineUserId = mUserId;
 		match.isOnline = true;
 		startingGame = true;
 		Screen screen = new GameScreen(game, match);

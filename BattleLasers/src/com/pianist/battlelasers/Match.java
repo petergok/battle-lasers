@@ -20,7 +20,9 @@ public class Match
 	
 	public boolean isOnline;
 	
-	public int onlinePlayerNumber;
+	public int playerNumberForOnline;
+	
+	public int onlineUserId;
 
 	public int numGames;
 	
@@ -64,7 +66,7 @@ public class Match
 	{
 		onePlayer = false;
 		isOnline = false;
-		onlinePlayerNumber = 0;
+		playerNumberForOnline = 0;
 		numGames = 3;
 		numMirrors = 4;
 		turnLength = 30;
@@ -160,7 +162,7 @@ public class Match
 		// If the game was restarted, return the same layout
 		if (!nextGameStarted)
 		{
-			currentLayout.generatePositions();
+			currentLayout.generatePositions(false);
 			return currentLayout;
 		}
 
@@ -174,7 +176,7 @@ public class Match
 				int layout = (int) (Math.random() * ((numMirrors == 3) ? 4 : 3))
 						+ (numMirrors - 1) * 3;
 				currentLayout = layouts[layout];
-				currentLayout.generatePositions();
+				currentLayout.generatePositions(false);
 				return layouts[layout];
 			}
 		}
@@ -184,7 +186,7 @@ public class Match
 			{
 				int layout = (int) (Math.random() * 10);
 				currentLayout = layouts[layout];
-				currentLayout.generatePositions();
+				currentLayout.generatePositions(false);
 				return layouts[layout];
 			}
 		}
@@ -236,13 +238,17 @@ public class Match
 		 * Generates the positions of the mirrors by extracting them from the
 		 * array of rows and columns as well as the list of orientations
 		 */
-		public void generatePositions()
+		public void generatePositions(boolean flipY)
 		{
 			positions = new LinkedList<Point>();
 			this.isHorizonal = new LinkedList<Boolean>();
 			for (int mirror = 0; mirror < rows.length; mirror++)
 			{
-				positions.add(new Point(rows[mirror], cols[mirror]));
+				if (flipY) {
+					positions.add(new Point(11 - rows[mirror], cols[mirror]));
+				} else {
+					positions.add(new Point(rows[mirror], cols[mirror]));
+				}
 				this.isHorizonal.add(horizonal[mirror]);
 			}
 		}

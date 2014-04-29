@@ -102,8 +102,13 @@ public class BattleLaserGame extends Activity
 	    			((MultiSetupScreen) screen).createdMatch(otherPlayerName, mapId, playerNumber);
 	    		}
 	        } else if (intent.getAction().equals(MOVE)) {
-	        	Point moveStart = new Point(intent.getIntExtra("startX", -1), intent.getIntExtra("startY", -1));
-	        	Point moveEnd = new Point(intent.getIntExtra("endX", -1), intent.getIntExtra("endY", -1));
+	        	Point moveStart = new Point(intent.getIntExtra("startRow", -1), intent.getIntExtra("startCol", -1));
+	        	Point moveEnd = new Point(intent.getIntExtra("endRow", -1), intent.getIntExtra("endCol", -1));
+	        	if (moveStart.y > 6 || moveStart.y < 1 || moveEnd.y > 6 || moveEnd.y < 1 || 
+	        			moveStart.x > 10 || moveStart.x < 1 || moveEnd.x > 10 || moveEnd.x < 1) {
+	        		moveStart = null;
+	        		moveEnd = null;
+	        	}
 	        	if (screen instanceof GameScreen) {
 	        		((GameScreen) screen).onlineMoveMade(moveStart, moveEnd);
 	        	}

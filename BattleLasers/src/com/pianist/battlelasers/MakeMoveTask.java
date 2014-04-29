@@ -43,10 +43,16 @@ public class MakeMoveTask extends AsyncTask<Void, Void, String>
         	HttpPut method = new HttpPut(uri);
         	
         	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(4);
-            nameValuePairs.add(new BasicNameValuePair("lastMoveStartX", "" + mLastMoveStart.x));
-            nameValuePairs.add(new BasicNameValuePair("lastMoveStartY", "" + mLastMoveStart.y));
-            nameValuePairs.add(new BasicNameValuePair("endX", "" + mLastMoveEnd.x));
-            nameValuePairs.add(new BasicNameValuePair("endY", "" + mLastMoveEnd.y));
+        	if (mLastMoveStart == null) {
+        		mLastMoveStart = new Point (-1, -1);
+        	}
+        	if (mLastMoveEnd == null) {
+        		mLastMoveEnd = new Point (-1, -1);
+        	}
+            nameValuePairs.add(new BasicNameValuePair("startRow", "" + mLastMoveStart.x));
+            nameValuePairs.add(new BasicNameValuePair("startCol", "" + mLastMoveStart.y));
+            nameValuePairs.add(new BasicNameValuePair("endRow", "" + mLastMoveEnd.x));
+            nameValuePairs.add(new BasicNameValuePair("endCol", "" + mLastMoveEnd.y));
             method.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
             response = httpclient.execute(method);

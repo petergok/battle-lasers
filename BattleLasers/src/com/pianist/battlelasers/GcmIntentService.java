@@ -72,15 +72,15 @@ public class GcmIntentService extends IntentService {
     			intent.putExtra("mapId", mapId);
     			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     		} else if (messageType.equals("move")) {
-    			int startX = Integer.parseInt(data.getString("startX"));
-    			int startY = Integer.parseInt(data.getString("startY"));
-    			int endX = Integer.parseInt(data.getString("endX"));
-    			int endY = Integer.parseInt(data.getString("endY"));
+    			int startRow = Integer.parseInt(data.getString("startRow"));
+    			int startCol = Integer.parseInt(data.getString("startCol"));
+    			int endRow = Integer.parseInt(data.getString("endRow"));
+    			int endCol = Integer.parseInt(data.getString("endCol"));
     			Intent intent = new Intent(BattleLaserGame.MOVE);
-    			intent.putExtra("startX", startX);
-    			intent.putExtra("startY", startY);
-    			intent.putExtra("endX", endX);
-    			intent.putExtra("endY", endY);
+    			intent.putExtra("startRow", startRow);
+    			intent.putExtra("startCol", startCol);
+    			intent.putExtra("endRow", endRow);
+    			intent.putExtra("endCol", endCol);
     			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     		}
     		

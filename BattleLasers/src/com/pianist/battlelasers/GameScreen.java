@@ -142,10 +142,14 @@ public class GameScreen extends Screen
 		// Gets the current match's mirror layout and loads it into the grid and
 		// list
 		Layout nextLayout;
-		if (match.isOnline) {
+		if (!match.isOnline) {
 			nextLayout = match.getNextLayout();
 		} else {
-			match.currentLayout.generatePositions();
+			if (match.playerNumberForOnline == 2) {
+				match.currentLayout.generatePositions(true);
+			} else {
+				match.currentLayout.generatePositions(false);
+			}
 			nextLayout = match.currentLayout;
 		}
 		Point nextPoint;
@@ -174,7 +178,7 @@ public class GameScreen extends Screen
 				Assets.gameMenuButtonClck);
 
 		// Initialize other important variables to default
-		if (match.isOnline && match.onlinePlayerNumber == 2) {
+		if (match.isOnline && match.playerNumberForOnline == 2) {
 			playerOneTurn = false;
 		} else {
 			playerOneTurn = true;
@@ -1859,13 +1863,7 @@ public class GameScreen extends Screen
 				{
 					if (state != GameState.WinningAnimation)
 					{
-						winStartTime = timeSinceStart;
-						laserDrawEnd = timeSinceStart;
-						showWinner = true;
-						if (playerOneTurn)
-							match.playerOneScore++;
-						else
-							match.playerTwoScore++;
+						winGame();
 					}
 					state = GameState.WinningAnimation;
 					return;
@@ -1874,13 +1872,7 @@ public class GameScreen extends Screen
 				{
 					if (state != GameState.WinningAnimation)
 					{
-						winStartTime = timeSinceStart;
-						laserDrawEnd = timeSinceStart;
-						showWinner = true;
-						if (playerOneTurn)
-							match.playerOneScore++;
-						else
-							match.playerTwoScore++;
+						winGame();
 					}
 					state = GameState.WinningAnimation;
 					return;
@@ -1892,13 +1884,7 @@ public class GameScreen extends Screen
 				{
 					if (state != GameState.WinningAnimation)
 					{
-						winStartTime = timeSinceStart;
-						laserDrawEnd = timeSinceStart;
-						showWinner = true;
-						if (playerOneTurn)
-							match.playerOneScore++;
-						else
-							match.playerTwoScore++;
+						winGame();
 					}
 					state = GameState.WinningAnimation;
 					return;
@@ -1907,13 +1893,7 @@ public class GameScreen extends Screen
 				{
 					if (state != GameState.WinningAnimation)
 					{
-						winStartTime = timeSinceStart;
-						laserDrawEnd = timeSinceStart;
-						showWinner = true;
-						if (playerOneTurn)
-							match.playerOneScore++;
-						else
-							match.playerTwoScore++;
+						winGame();
 					}
 					state = GameState.WinningAnimation;
 					return;
@@ -2099,6 +2079,19 @@ public class GameScreen extends Screen
 			computerPlayer.startCalculatingMove(lastMoveStart, lastMoveEnd);
 		}
 	}
+	
+	private void winGame() {
+		winStartTime = timeSinceStart;
+		laserDrawEnd = timeSinceStart;
+		showWinner = true;
+		if (playerOneTurn)
+			match.playerOneScore++;
+		else
+			match.playerTwoScore++;
+		if (match.isOnline && playerOneTurn) {
+			new MakeMoveTask(null, null, match.onlineUserId).execute();
+		}
+	}
 
 	/**
 	 * Changes turns and update the move stack and game state
@@ -2124,7 +2117,7 @@ public class GameScreen extends Screen
 		}
 		else if (match.isOnline && !playerOneTurn)
 		{
-			
+			new MakeMoveTask(lastMoveStart, lastMoveEnd, match.onlineUserId).execute();
 		}
 	}
 
@@ -2768,7 +2761,6 @@ public class GameScreen extends Screen
 	public synchronized void onlineMoveMade(Point start, Point end) {
 		Move move = new Move(start, end);
 		makeMove(move);
-		computerPlayer.checkAIWin();
 	}
 	
 	public Match getMatch() {
