@@ -2,14 +2,19 @@ package com.pianist.battlelasers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -35,8 +40,12 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
         String uri = BattleLaserGame.BASE_URL + "/player";
         try {
         	HttpPut method = new HttpPut(uri);
-        	method.addHeader("registrationId", mRegId);
-        	method.addHeader("rating", mRating + "");
+        	
+        	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+            nameValuePairs.add(new BasicNameValuePair("registrationId", mRegId));
+            nameValuePairs.add(new BasicNameValuePair("rating", "" + mRating));
+            method.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+        	
             response = httpclient.execute(method);
             StatusLine statusLine = response.getStatusLine();
             if(statusLine.getStatusCode() == HttpStatus.SC_OK){

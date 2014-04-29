@@ -2,14 +2,19 @@ package com.pianist.battlelasers;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 
 import android.graphics.Point;
 import android.os.AsyncTask;
@@ -36,10 +41,14 @@ public class MakeMoveTask extends AsyncTask<Void, Void, String>
         String uri = BattleLaserGame.BASE_URL + "/player/" + mPlayerId + "/move";
         try {
         	HttpPut method = new HttpPut(uri);
-        	method.addHeader("lastMoveStartX", "" + mLastMoveStart.x);
-        	method.addHeader("lastMoveStartY", "" + mLastMoveStart.y);
-        	method.addHeader("lastMoveEndX", "" + mLastMoveEnd.x);
-        	method.addHeader("lastMoveEndY", "" + mLastMoveEnd.y);
+        	
+        	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(4);
+            nameValuePairs.add(new BasicNameValuePair("lastMoveStartX", "" + mLastMoveStart.x));
+            nameValuePairs.add(new BasicNameValuePair("lastMoveStartY", "" + mLastMoveStart.y));
+            nameValuePairs.add(new BasicNameValuePair("endX", "" + mLastMoveEnd.x));
+            nameValuePairs.add(new BasicNameValuePair("endY", "" + mLastMoveEnd.y));
+            method.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
             response = httpclient.execute(method);
             StatusLine statusLine = response.getStatusLine();
             if(statusLine.getStatusCode() == HttpStatus.SC_OK){

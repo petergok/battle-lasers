@@ -64,18 +64,18 @@ public class GcmIntentService extends IntentService {
     		}
     		if (messageType.equals("startMatch")) {
     			String otherPlayerName = data.getString("otherPlayerName");
-    			int playerNumber = data.getInt("playerNumber");
-    			int mapId = data.getInt("mapId");
+    			int playerNumber = Integer.parseInt(data.getString("playerNumber"));
+    			int mapId = Integer.parseInt(data.getString("mapId"));
     			Intent intent = new Intent(BattleLaserGame.MATCH_STARTED);
     			intent.putExtra("otherPlayerName", otherPlayerName);
     			intent.putExtra("playerNumber", playerNumber);
     			intent.putExtra("mapId", mapId);
     			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     		} else if (messageType.equals("move")) {
-    			int startX = data.getInt("startX");
-    			int startY = data.getInt("startY");
-    			int endX = data.getInt("endX");
-    			int endY = data.getInt("endY");
+    			int startX = Integer.parseInt(data.getString("startX"));
+    			int startY = Integer.parseInt(data.getString("startY"));
+    			int endX = Integer.parseInt(data.getString("endX"));
+    			int endY = Integer.parseInt(data.getString("endY"));
     			Intent intent = new Intent(BattleLaserGame.MOVE);
     			intent.putExtra("startX", startX);
     			intent.putExtra("startY", startY);
@@ -85,7 +85,7 @@ public class GcmIntentService extends IntentService {
     		}
     		
     	} catch (Exception e) {
-    		
+    		Log.e("EXCEPTION", "exception: ", e);
     	}
     }
 }
