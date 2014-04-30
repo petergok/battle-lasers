@@ -57,6 +57,19 @@ public class Match
 		currentLayout = null;
 		gameNumber = 1;
 		nextGameStarted = true;
+		isOnline = false;
+	}
+	
+	public void resetOnline()
+	{
+		reset();
+		numGames = 1;
+		playerNumberForOnline = 0;
+		onePlayer = false;
+		isOnline = true;
+		numMirrors = 4;
+		turnLength = 30;
+		timerOn = true;
 	}
 
 	/**

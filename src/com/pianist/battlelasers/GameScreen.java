@@ -128,11 +128,11 @@ public class GameScreen extends Screen
 	 * @param match
 	 *            The parameters for the current match, including whether it is
 	 *            one player or two player, how long a turn is and how many
-	 *            mirrors are invovled
+	 *            mirrors are involved
 	 */
 	public GameScreen(BattleLaserGame game, Match match)
 	{
-		super(game);
+		super(game, match);
 
 		this.match = match;
 		grid = new Mirror[12][8];
@@ -215,7 +215,7 @@ public class GameScreen extends Screen
 		timeSinceStart += deltaTime;
 		laserStartTime += deltaTime;
 		if (!match.timerOn || freezeTime || state == GameState.TapToStart
-				|| shootLaser || showMenu)
+				|| shootLaser || (showMenu && !match.isOnline))
 		{
 			turnStart += deltaTime;
 		}
@@ -232,7 +232,7 @@ public class GameScreen extends Screen
 				state = GameState.Running;
 			else if (showWinner)
 				showWinner = false;
-			else if (state == GameState.TimeRanOut)
+			else if (state == GameState.TimeRanOut && (!match.isOnline || playerOneTurn))
 			{
 				lastMoveStart = null;
 				lastMoveEnd = null;
@@ -253,7 +253,7 @@ public class GameScreen extends Screen
 		if (state == GameState.Animate)
 			return;
 
-		// Automatically switches turns 0.8 seconds after winning
+		// Automatically switches turns 0.8 seconds after shooting
 		if (state == GameState.Running)
 		{
 			if (shootLaser && timeSinceStart - laserDrawEnd > 0.8)
@@ -330,6 +330,10 @@ public class GameScreen extends Screen
 				if (mainButton.wasReleased())
 				{
 					disposeAnimationImages();
+					if (match.isOnline) 
+					{
+						new UnregisterPlayerTask(match.onlineUserId).execute();
+					}
 					Screen nextScreen = new MainMenuScreen(game, true, match);
 					game.setScreen(nextScreen);
 				}
@@ -367,9 +371,19 @@ public class GameScreen extends Screen
 								nextEvent.type);
 						if (newButton.wasReleased())
 						{
-							Screen nextScreen = new GameSetupScreen(game, true,
-									match);
-							game.setScreen(nextScreen);
+							if (match.isOnline) 
+							{
+								new UnregisterPlayerTask(match.onlineUserId).execute();
+								Screen nextScreen = new MultiSetupScreen(game, true,
+										match);
+								game.setScreen(nextScreen);
+							} 
+							else 
+							{
+								Screen nextScreen = new GameSetupScreen(game, true,
+										match);
+								game.setScreen(nextScreen);
+							}
 						}
 					}
 					else
@@ -581,11 +595,11 @@ public class GameScreen extends Screen
 
 		// Update the game state based on how much time passed since the time
 		// ran out
-		if (timeSinceStart - turnStart >= turnLength + 0.2)
+		if (timeSinceStart - turnStart >= turnLength + 0.2 && (!match.isOnline || playerOneTurn))
 		{
 			state = GameState.TimeRanOut;
 		}
-		if (timeSinceStart - turnStart >= turnLength + 2.5)
+		if (timeSinceStart - turnStart >= turnLength + 2.5 && (!match.isOnline || playerOneTurn))
 		{
 			lastMoveStart = null;
 			lastMoveEnd = null;
@@ -2089,7 +2103,7 @@ public class GameScreen extends Screen
 		else
 			match.playerTwoScore++;
 		if (match.isOnline && playerOneTurn) {
-			new MakeMoveTask(null, null, match.onlineUserId).execute();
+			new MakeMoveTask(null, null, playerOne.getDirection() == 2, match.onlineUserId).execute();
 		}
 	}
 
@@ -2117,7 +2131,7 @@ public class GameScreen extends Screen
 		}
 		else if (match.isOnline && !playerOneTurn)
 		{
-			new MakeMoveTask(lastMoveStart, lastMoveEnd, match.onlineUserId).execute();
+			new MakeMoveTask(lastMoveStart, lastMoveEnd, playerOne.getDirection() == 2, match.onlineUserId).execute();
 		}
 	}
 
@@ -2758,13 +2772,22 @@ public class GameScreen extends Screen
 		}
 	}
 	
-	public synchronized void onlineMoveMade(Point start, Point end) {
+	public synchronized void onlineMoveMade(Point start, Point end, boolean turnRight) {
 		Move move = new Move(start, end);
+		if (turnRight) {
+			move.needToTurnRight();
+		}
 		makeMove(move);
 	}
 	
 	public Match getMatch() {
 		return match;
+	}
+	
+	public synchronized void registeredUser(int userId) {
+		if (match != null) {
+			match.onlineUserId = userId;
+		}
 	}
 
 	/**

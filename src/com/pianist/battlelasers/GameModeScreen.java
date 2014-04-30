@@ -48,7 +48,7 @@ public class GameModeScreen extends Screen
 	 */
 	public GameModeScreen(BattleLaserGame game, Match match)
 	{
-		super(game);
+		super(game, match);
 
 		loaded = false;
 
@@ -127,7 +127,9 @@ public class GameModeScreen extends Screen
 				match.onePlayer = false;
 				Screen screen = new GameSetupScreen(game, false, match);
 				game.setScreen(screen);
-			} else if (onlineMultButton.wasReleased()) {
+			} 
+			else if (onlineMultButton.wasReleased()) 
+			{
 				Screen screen = new MultiSetupScreen(game, false, match);
 				game.setScreen(screen);
 			}

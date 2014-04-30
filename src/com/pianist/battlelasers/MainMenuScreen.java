@@ -48,7 +48,7 @@ public class MainMenuScreen extends Screen
 	 */
 	public MainMenuScreen(BattleLaserGame game, boolean loadImages, Match match)
 	{
-		super(game);
+		super(game, match);
 		loaded = false;
 		this.loadImages = loadImages;
 		match.reset();

@@ -48,7 +48,7 @@ public class GameSetupScreen extends Screen
 	 */
 	public GameSetupScreen(BattleLaserGame game, boolean loadImages, Match match)
 	{
-		super(game);
+		super(game, match);
 
 		this.loadImages = loadImages;
 		loaded = false;

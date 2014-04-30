@@ -48,7 +48,7 @@ public class InstructionsScreen extends Screen
 	public InstructionsScreen(BattleLaserGame game, int number, Match match,
 			boolean loadImages)
 	{
-		super(game);
+		super(game, match);
 		this.number = number;
 		this.loadImages = loadImages;
 		loaded = false;

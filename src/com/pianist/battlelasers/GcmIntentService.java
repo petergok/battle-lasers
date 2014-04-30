@@ -76,11 +76,13 @@ public class GcmIntentService extends IntentService {
     			int startCol = Integer.parseInt(data.getString("startCol"));
     			int endRow = Integer.parseInt(data.getString("endRow"));
     			int endCol = Integer.parseInt(data.getString("endCol"));
+    			boolean turnRight = data.getString("turnRight").equals("true");
     			Intent intent = new Intent(BattleLaserGame.MOVE);
     			intent.putExtra("startRow", startRow);
     			intent.putExtra("startCol", startCol);
     			intent.putExtra("endRow", endRow);
     			intent.putExtra("endCol", endCol);
+    			intent.putExtra("turnRight", turnRight);
     			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     		}
     		

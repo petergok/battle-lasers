@@ -21,8 +21,9 @@ public class MultiSetupScreen extends Screen
 	private boolean loaded;
 	
 	public MultiSetupScreen(BattleLaserGame game, boolean loadImages, Match match) {
-		super(game);
+		super(game, match);
 		
+		match.resetOnline();
 		this.match = match;
 		this.loadImages = loadImages;
 		

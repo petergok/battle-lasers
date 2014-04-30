@@ -104,13 +104,14 @@ public class BattleLaserGame extends Activity
 	        } else if (intent.getAction().equals(MOVE)) {
 	        	Point moveStart = new Point(intent.getIntExtra("startRow", -1), intent.getIntExtra("startCol", -1));
 	        	Point moveEnd = new Point(intent.getIntExtra("endRow", -1), intent.getIntExtra("endCol", -1));
+	        	boolean turnRight = intent.getBooleanExtra("turnRight", false);
 	        	if (moveStart.y > 6 || moveStart.y < 1 || moveEnd.y > 6 || moveEnd.y < 1 || 
 	        			moveStart.x > 10 || moveStart.x < 1 || moveEnd.x > 10 || moveEnd.x < 1) {
 	        		moveStart = null;
 	        		moveEnd = null;
 	        	}
 	        	if (screen instanceof GameScreen) {
-	        		((GameScreen) screen).onlineMoveMade(moveStart, moveEnd);
+	        		((GameScreen) screen).onlineMoveMade(moveStart, moveEnd, turnRight);
 	        	}
 	        }
 	    }
@@ -314,6 +315,7 @@ public class BattleLaserGame extends Activity
 	/**
 	 * When the game is paused, tell the graphics to stop rendering, and if the game is closing tell the screen it is being closed
 	 */
+	@Override
 	public void onPause()
 	{
 		super.onPause();
@@ -321,6 +323,15 @@ public class BattleLaserGame extends Activity
 		screen.pause();
 		if (isFinishing())
 			screen.dispose();
+	}
+	
+	@Override
+	public void onStop() {
+		Match match = screen.getMatch();
+		if (match != null && match.isOnline) {
+			new UnregisterPlayerTask(match.onlineUserId).execute();
+		}
+		super.onStop();
 	}
 
 	/**
@@ -420,6 +431,8 @@ public class BattleLaserGame extends Activity
 	public void registeredUser(int userId) {
 		if (screen instanceof MultiSetupScreen) {
 			((MultiSetupScreen) screen).registeredUser(userId);
+		} else if (screen instanceof GameScreen) {
+			((GameScreen) screen).registeredUser(userId);
 		}
 	}
 	
@@ -429,6 +442,4 @@ public class BattleLaserGame extends Activity
 	
 	public void dismissProgressDialog() {
 	}
-	
-	
 }

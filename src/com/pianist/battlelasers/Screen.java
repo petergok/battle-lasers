@@ -10,6 +10,7 @@ public abstract class Screen {
 	
 	// Store the game object to use for drawing, input management and other access to features
     protected final BattleLaserGame game;
+    protected Match mMatch;
 
     /**
      * Creates a default Screen by passing the BattleLaserGame object and storing it
@@ -17,8 +18,13 @@ public abstract class Screen {
      * @param game
      * 		The BattleLaserGame that created this screen
      */
-    public Screen(BattleLaserGame game) {
+    public Screen(BattleLaserGame game, Match match) {
         this.game = game;
+        mMatch = match;
+    }
+    
+    public Match getMatch() {
+    	return mMatch;
     }
 
     /**
