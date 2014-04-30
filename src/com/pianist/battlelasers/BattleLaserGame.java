@@ -12,6 +12,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -83,13 +85,17 @@ public class BattleLaserGame extends Activity
 	// Context
 	private Context mContext;
 	
+	private ProgressDialog mDialog;
+	
 	// Preferences file
+	public static SharedPreferences settings;
 	public static final String BATTLE_LASERS_PREFS = "battle_lasers_prefs";
 	
 	public static final String MATCH_STARTED = "com.pianist.battlelasers.MATCH_STARTED";
 	public static final String MOVE = "com.pinaist.battlelasers.MOVE";
 	
 	public static final String PREF_RATING = "pref_rating";
+	public static final String PREF_USER_ID = "pref_user_id";
 	
 	private BroadcastReceiver bReceiver = new BroadcastReceiver() {
 	    @Override
@@ -161,7 +167,7 @@ public class BattleLaserGame extends Activity
 		
 		mContext = getApplicationContext();
 		
-		SharedPreferences settings = getSharedPreferences(BATTLE_LASERS_PREFS, 0);
+		settings = getSharedPreferences(BATTLE_LASERS_PREFS, 0);
 	    mRating = settings.getInt(PREF_RATING, 1000);
 		
 		LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
@@ -429,6 +435,9 @@ public class BattleLaserGame extends Activity
 	}
 	
 	public void registeredUser(int userId) {
+		SharedPreferences.Editor editor = settings.edit();
+	    editor.putInt(PREF_USER_ID, userId);
+	    editor.commit();
 		if (screen instanceof MultiSetupScreen) {
 			((MultiSetupScreen) screen).registeredUser(userId);
 		} else if (screen instanceof GameScreen) {
@@ -437,9 +446,30 @@ public class BattleLaserGame extends Activity
 	}
 	
 	public void showProgressDialog() {
+		final BattleLaserGame game = this;
+		runOnUiThread(new Runnable() {
 
+			@Override
+			public void run()
+			{
+				mDialog = new ProgressDialog(game, ProgressDialog.THEME_HOLO_DARK);
+				mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+				mDialog.setMessage("Looking for a match...");
+				mDialog.setOnCancelListener(new OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog)
+					{
+						new UnregisterPlayerTask(game.screen.getMatch().onlineUserId).execute();
+					}
+				});
+				mDialog.show();
+			}
+			
+		});
+		
 	}
 	
 	public void dismissProgressDialog() {
+		mDialog.dismiss();
 	}
 }

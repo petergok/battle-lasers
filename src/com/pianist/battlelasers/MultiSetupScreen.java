@@ -8,8 +8,6 @@ import com.pianist.battlelasers.Input.TouchEvent;
 
 public class MultiSetupScreen extends Screen
 {
-	private int mUserId;
-	
 	private boolean loadImages;
 	
 	private Button quickMatchButton;
@@ -33,14 +31,14 @@ public class MultiSetupScreen extends Screen
 	}
 	
 	public void registeredUser(int id) {
-		mUserId = id;
+		game.showProgressDialog();
+		match.onlineUserId = id;
 	}
 	
 	public void createdMatch(String otherPlayerName, int mapId, int playerNumber) {
 		game.dismissProgressDialog();
 		match.playerNumberForOnline = playerNumber;
 		match.currentLayout = match.getLayout(mapId);
-		match.onlineUserId = mUserId;
 		match.isOnline = true;
 		startingGame = true;
 		Screen screen = new GameScreen(game, match);
@@ -257,8 +255,8 @@ public class MultiSetupScreen extends Screen
 			
 			if (quickMatchButton.wasReleased())
 			{
+				match.onlineUserId = BattleLaserGame.settings.getInt(BattleLaserGame.PREF_USER_ID, 0);
 				game.registerGCM();
-				game.showProgressDialog();
 			}
 		}
 	}
