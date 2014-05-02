@@ -337,7 +337,7 @@ public class BattleLaserGame extends Activity
 	
 	@Override
 	public void onStop() {
-		if (mMatch != null && mMatch.onlineUserId != 0) {
+		if (mMatch != null && mMatch.onlineUserId != 0 && mMatch.matchStarted) {
 			mMatch.loseOnlineGame();
 			SharedPreferences.Editor editor = settings.edit();
 		    editor.putInt(PREF_RATING, mMatch.onlineRating);

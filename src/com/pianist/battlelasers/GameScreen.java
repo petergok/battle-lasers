@@ -228,8 +228,11 @@ public class GameScreen extends Screen
 		{
 			// If the back key was pressed, change the state of the game based
 			// on the current state
-			if (state == GameState.TapToStart)
+			if (state == GameState.TapToStart) 
+			{
 				state = GameState.Running;
+				match.matchStarted = true;
+			}
 			else if (showWinner)
 				showWinner = false;
 			else if (state == GameState.TimeRanOut && (!match.isOnline || playerOneTurn))

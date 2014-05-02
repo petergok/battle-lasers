@@ -48,6 +48,8 @@ public class Match
 	public AIDifficulty computerDifficulty;
 	
 	public int onlineRating;
+	
+	public boolean matchStarted;
 
 	/**
 	 * Resets the match back to its initial parameters after the game is over,
@@ -61,6 +63,7 @@ public class Match
 		gameNumber = 1;
 		nextGameStarted = true;
 		isOnline = false;
+		matchStarted = false;
 	}
 	
 	public void resetOnline()
@@ -93,6 +96,8 @@ public class Match
 		nextGameStarted = true;
 		computerDifficulty = AIDifficulty.Easy;
 		timerOn = true;
+		matchStarted = false;
+		reset();
 
 		// Create all the layouts in the game
 		layouts = new Layout[10];
