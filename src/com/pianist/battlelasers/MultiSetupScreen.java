@@ -31,7 +31,7 @@ public class MultiSetupScreen extends Screen
 	}
 	
 	public void registeredUser(int id) {
-		game.showProgressDialog();
+		game.showProgressDialog("Looking for a match...");
 		match.onlineUserId = id;
 	}
 	
@@ -274,6 +274,7 @@ public class MultiSetupScreen extends Screen
 			else if (matchSearchButton.wasReleased()) 
 			{
 				match.onlineUserId = BattleLaserGame.settings.getInt(BattleLaserGame.PREF_USER_ID, 0);
+				game.showProgressDialog("Connecting to server...");
 				game.registerGCM();
 			}
 		}

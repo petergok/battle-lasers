@@ -15,6 +15,9 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -33,7 +36,7 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
 	
 	@Override
 	protected String doInBackground(Void... args)
-	{
+	{	
 		HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = "none";
@@ -53,15 +56,14 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
                 response.getEntity().writeTo(out);
                 out.close();
                 responseString = out.toString();
-            } else{
+            } else {
                 //Closes the connection.
                 response.getEntity().getContent().close();
                 throw new IOException(statusLine.getReasonPhrase());
             }
         } catch (ClientProtocolException e) {
-            //TODO Handle problems..
         } catch (IOException e) {
-            //TODO Handle problems..
+        	mActivity.checkNetworkConnection();
         }
         return responseString;
 	}

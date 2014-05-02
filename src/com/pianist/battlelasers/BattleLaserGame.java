@@ -6,9 +6,12 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -27,6 +30,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 /**
  * BattleLaserGame is the main game activity of the project. It handles the
@@ -182,6 +186,7 @@ public class BattleLaserGame extends Activity
 	}
 	
 	public void registerGCM() {
+		
 		// Check device for Play Services APK.
 	    if (checkPlayServices()) {
 	        // If this check succeeds, proceed with normal processing.
@@ -454,10 +459,9 @@ public class BattleLaserGame extends Activity
 		}
 	}
 	
-	public void showProgressDialog() {
+	public void showProgressDialog(final String text) {
 		final BattleLaserGame game = this;
 		runOnUiThread(new Runnable() {
-
 			@Override
 			public void run()
 			{
@@ -467,7 +471,17 @@ public class BattleLaserGame extends Activity
 					wmlp.y = screenHeight / 18;
 					mDialog.getWindow().setAttributes(wmlp);
 					mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-					mDialog.setMessage("Looking for a match...");
+					mDialog.setMessage(text);
+					mDialog.setOnCancelListener(new OnCancelListener() {
+						@Override
+						public void onCancel(DialogInterface dialog)
+						{
+							new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+						}
+					});
+					mDialog.show();
+				} else {
+					mDialog.setMessage(text);
 					mDialog.setOnCancelListener(new OnCancelListener() {
 						@Override
 						public void onCancel(DialogInterface dialog)
@@ -478,12 +492,36 @@ public class BattleLaserGame extends Activity
 					mDialog.show();
 				}
 			}
-			
 		});
-		
 	}
 	
 	public void dismissProgressDialog() {
-		mDialog.dismiss();
+		if (mDialog != null) {
+			mDialog.dismiss();
+		}
+	}
+	
+	public void checkNetworkConnection() {
+		dismissProgressDialog();
+		final BattleLaserGame game = this;
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (isNetworkAvailable()) {
+					Toast.makeText(game, "An error occured while connecting", Toast.LENGTH_SHORT).show();
+				} else {
+					AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
+					builder.setTitle("Network Error").setMessage("Please make sure that you are connected to the internet.")
+						.setPositiveButton("OK", null).show();
+				}
+			}
+		});
+	}
+	
+	private boolean isNetworkAvailable() {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
 }
