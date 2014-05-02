@@ -10,7 +10,9 @@ public class MultiSetupScreen extends Screen
 {
 	private boolean loadImages;
 	
-	private Button quickMatchButton;
+	private Button leftButton;
+	
+	private Button matchSearchButton;
 	
 	private Match match;
 	
@@ -26,8 +28,6 @@ public class MultiSetupScreen extends Screen
 		this.loadImages = loadImages;
 		
 		loaded = false;
-		
-		match.reset();
 	}
 	
 	public void registeredUser(int id) {
@@ -39,7 +39,6 @@ public class MultiSetupScreen extends Screen
 		game.dismissProgressDialog();
 		match.playerNumberForOnline = playerNumber;
 		match.currentLayout = match.getLayout(mapId);
-		match.isOnline = true;
 		startingGame = true;
 		Screen screen = new GameScreen(game, match);
 		game.setScreen(screen);
@@ -206,9 +205,16 @@ public class MultiSetupScreen extends Screen
 
 				Assets.singleSetupBackground = g.newPixmap("SingleGameSetupScreen.png",
 						PixmapFormat.ARGB4444);
+				Assets.multiSetupBackground = g.newPixmap("MultiSetupScreen.png",
+						PixmapFormat.ARGB4444);
 				Assets.onSetupBackground = g.newPixmap("GameSetupScreenOn.png",
 						PixmapFormat.ARGB4444);
 				Assets.offSetupBackground = g.newPixmap("GameSetupScreenOff.png",
+						PixmapFormat.ARGB4444);
+				
+				Assets.matchSearchButtonNor = g.newPixmap("MatchSearchButtonNormal.png", 
+						PixmapFormat.ARGB4444);
+				Assets.matchSearchButtonClck = g.newPixmap("MatchSearchButtonClicked.png", 
 						PixmapFormat.ARGB4444);
 				
 				Assets.easyModeSelect = g.newPixmap("EasyModeSelect.png",
@@ -225,9 +231,14 @@ public class MultiSetupScreen extends Screen
 				Assets.mixedSelect = g.newPixmap("MixedSelect.png",
 						PixmapFormat.ARGB4444);
 			}
+			
 
-			quickMatchButton = new Button(367, 727, Assets.rightButtonNor,
-					Assets.rightButtonClck);
+			leftButton = new Button(28, 727, Assets.leftButtonNor,
+					Assets.leftButtonClck);
+			
+			matchSearchButton = new Button(75, 420, Assets.matchSearchButtonNor,
+					Assets.matchSearchButtonClck);
+			
 		}
 		else 
 		{
@@ -250,10 +261,17 @@ public class MultiSetupScreen extends Screen
 				TouchEvent nextEvent = touchEvents.get(event);
 
 				// Update the buttons
-				quickMatchButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
+				leftButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
+				matchSearchButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
 			}
 			
-			if (quickMatchButton.wasReleased())
+			if (leftButton.wasReleased())
+			{
+				Screen screen = new GameModeScreen(game, match);
+				game.setScreen(screen);
+				match.reset();
+			}
+			else if (matchSearchButton.wasReleased()) 
 			{
 				match.onlineUserId = BattleLaserGame.settings.getInt(BattleLaserGame.PREF_USER_ID, 0);
 				game.registerGCM();
@@ -268,8 +286,12 @@ public class MultiSetupScreen extends Screen
 
 		// Draw the background
 		g.drawPixmap(Assets.background, 0, 0);
+		g.drawPixmap(Assets.multiSetupBackground, 0, 0);
 		
-		quickMatchButton.draw(g);
+		leftButton.draw(g);
+		matchSearchButton.draw(g);
+		int ratingPosition = (match.onlineRating >= 1000) ? 270 : 300;
+		g.drawText(ratingPosition, 650, 60, "" + match.onlineRating);
 	}
 
 	@Override
@@ -290,6 +312,9 @@ public class MultiSetupScreen extends Screen
 			game.disposeImage(Assets.singleSetupBackground);
 			game.disposeImage(Assets.onSetupBackground);
 			game.disposeImage(Assets.offSetupBackground);
+			game.disposeImage(Assets.multiSetupBackground);
+			game.disposeImage(Assets.matchSearchButtonNor);
+			game.disposeImage(Assets.matchSearchButtonClck);
 			
 			game.disposeImage(Assets.easyModeSelect);
 			game.disposeImage(Assets.mediumModeSelect);
@@ -335,9 +360,6 @@ public class MultiSetupScreen extends Screen
 			game.disposeImage(Assets.easyModeSelect);
 			game.disposeImage(Assets.mediumModeSelect);
 			game.disposeImage(Assets.onOffSelect);
-			game.disposeImage(Assets.onSetupBackground);
-			game.disposeImage(Assets.offSetupBackground);
-			game.disposeImage(Assets.singleSetupBackground);
 		}
 	}
 }

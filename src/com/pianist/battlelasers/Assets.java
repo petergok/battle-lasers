@@ -232,4 +232,10 @@ public class Assets
 	public static Pixmap onSetupBackground;
 	
 	public static Pixmap offSetupBackground;
+	
+	public static Pixmap multiSetupBackground;
+	
+	public static Pixmap matchSearchButtonNor;
+	
+	public static Pixmap matchSearchButtonClck;
 }

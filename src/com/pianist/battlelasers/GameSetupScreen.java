@@ -227,9 +227,16 @@ public class GameSetupScreen extends Screen
 
 				Assets.singleSetupBackground = g.newPixmap("SingleGameSetupScreen.png",
 						PixmapFormat.ARGB4444);
+				Assets.multiSetupBackground = g.newPixmap("MultiSetupScreen.png",
+						PixmapFormat.ARGB4444);
 				Assets.onSetupBackground = g.newPixmap("GameSetupScreenOn.png",
 						PixmapFormat.ARGB4444);
 				Assets.offSetupBackground = g.newPixmap("GameSetupScreenOff.png",
+						PixmapFormat.ARGB4444);
+				
+				Assets.matchSearchButtonNor = g.newPixmap("MatchSearchButtonNormal.png", 
+						PixmapFormat.ARGB4444);
+				Assets.matchSearchButtonClck = g.newPixmap("MatchSearchButtonClicked.png", 
 						PixmapFormat.ARGB4444);
 				
 				Assets.easyModeSelect = g.newPixmap("EasyModeSelect.png",
@@ -513,8 +520,11 @@ public class GameSetupScreen extends Screen
 		if (startingGame)
 		{
 			game.disposeImage(Assets.singleSetupBackground);
+			game.disposeImage(Assets.multiSetupBackground);
 			game.disposeImage(Assets.onSetupBackground);
 			game.disposeImage(Assets.offSetupBackground);
+			game.disposeImage(Assets.matchSearchButtonNor);
+			game.disposeImage(Assets.matchSearchButtonClck);
 			
 			game.disposeImage(Assets.easyModeSelect);
 			game.disposeImage(Assets.mediumModeSelect);
@@ -560,9 +570,6 @@ public class GameSetupScreen extends Screen
 			game.disposeImage(Assets.easyModeSelect);
 			game.disposeImage(Assets.mediumModeSelect);
 			game.disposeImage(Assets.onOffSelect);
-			game.disposeImage(Assets.onSetupBackground);
-			game.disposeImage(Assets.offSetupBackground);
-			game.disposeImage(Assets.singleSetupBackground);
 		}
 	}
 }

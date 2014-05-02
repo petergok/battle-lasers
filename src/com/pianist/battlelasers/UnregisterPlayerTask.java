@@ -11,6 +11,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -55,6 +56,9 @@ public class UnregisterPlayerTask extends AsyncTask<Void, Void, String>
 	@Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
+        SharedPreferences.Editor editor = BattleLaserGame.settings.edit();
+	    editor.putInt(BattleLaserGame.PREF_USER_ID, 0);
+	    editor.commit();
         Log.d("RESPONSE", result);
     }
 }

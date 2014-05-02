@@ -24,7 +24,6 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Point;
 import android.support.v4.content.LocalBroadcastManager;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -63,8 +62,6 @@ public class BattleLaserGame extends Activity
 
 	int frameBufferHeight;
 	
-	private int mRating;
-	
 	// Play services resolution request
 	public static final String EXTRA_MESSAGE = "message";
     public static final String PROPERTY_REG_ID = "registration_id";
@@ -87,6 +84,8 @@ public class BattleLaserGame extends Activity
 	
 	private ProgressDialog mDialog;
 	
+	private Match mMatch;
+	
 	// Preferences file
 	public static SharedPreferences settings;
 	public static final String BATTLE_LASERS_PREFS = "battle_lasers_prefs";
@@ -96,6 +95,8 @@ public class BattleLaserGame extends Activity
 	
 	public static final String PREF_RATING = "pref_rating";
 	public static final String PREF_USER_ID = "pref_user_id";
+	
+	public static int screenHeight;
 	
 	private BroadcastReceiver bReceiver = new BroadcastReceiver() {
 	    @Override
@@ -152,23 +153,26 @@ public class BattleLaserGame extends Activity
 
 		// Gets the scale factor between the screen and buffer to handle user
 		// input
+		screenHeight = getResources().getDisplayMetrics().heightPixels;
 		float scaleX = (float) frameBufferWidth
-				/ getWindowManager().getDefaultDisplay().getWidth();
+				/ getResources().getDisplayMetrics().widthPixels;
 		float scaleY = (float) frameBufferHeight
-				/ getWindowManager().getDefaultDisplay().getHeight();
+				/ screenHeight;
 
 		// Create all the objects that run the game
 		renderView = new RenderGraphics(frameBuffer, this);
 		graphics = new Graphics(getAssets(), frameBuffer);
 		fileIO = new FileIO(this);
 		input = new Input(this, renderView, scaleX, scaleY);
-		screen = new MainMenuScreen(this, true, new Match());
+		
+		mMatch = new Match();
+		settings = getSharedPreferences(BATTLE_LASERS_PREFS, 0);
+	    mMatch.onlineRating = settings.getInt(PREF_RATING, 1000);
+	    mMatch.onlineUserId = settings.getInt(PREF_USER_ID, 0);
+		screen = new MainMenuScreen(this, true, mMatch);
 		setContentView(renderView);
 		
 		mContext = getApplicationContext();
-		
-		settings = getSharedPreferences(BATTLE_LASERS_PREFS, 0);
-	    mRating = settings.getInt(PREF_RATING, 1000);
 		
 		LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
 		IntentFilter intentFilter = new IntentFilter();
@@ -288,7 +292,7 @@ public class BattleLaserGame extends Activity
 	 * using the 'from' address in the message.
 	 */
 	private void sendRegistrationIdToBackend() {
-		new SendRegistrationIdTask(this, regid, mRating).execute();
+		new SendRegistrationIdTask(this, regid, mMatch.onlineRating).execute();
 	}
 	
 	/**
@@ -333,9 +337,14 @@ public class BattleLaserGame extends Activity
 	
 	@Override
 	public void onStop() {
-		Match match = screen.getMatch();
-		if (match != null && match.isOnline) {
-			new UnregisterPlayerTask(match.onlineUserId).execute();
+		if (mMatch != null && mMatch.onlineUserId != 0) {
+			mMatch.loseOnlineGame();
+			SharedPreferences.Editor editor = settings.edit();
+		    editor.putInt(PREF_RATING, mMatch.onlineRating);
+		    editor.commit();
+			new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+		} else if (mMatch != null && mMatch.isOnline) {
+			new UnregisterPlayerTask(mMatch.onlineUserId).execute();
 		}
 		super.onStop();
 	}
@@ -452,17 +461,22 @@ public class BattleLaserGame extends Activity
 			@Override
 			public void run()
 			{
-				mDialog = new ProgressDialog(game, ProgressDialog.THEME_HOLO_DARK);
-				mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-				mDialog.setMessage("Looking for a match...");
-				mDialog.setOnCancelListener(new OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface dialog)
-					{
-						new UnregisterPlayerTask(game.screen.getMatch().onlineUserId).execute();
-					}
-				});
-				mDialog.show();
+				if (mDialog == null || !mDialog.isShowing()) {
+					mDialog = new ProgressDialog(game, ProgressDialog.THEME_HOLO_DARK);
+					WindowManager.LayoutParams wmlp = mDialog.getWindow().getAttributes();
+					wmlp.y = screenHeight / 18;
+					mDialog.getWindow().setAttributes(wmlp);
+					mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+					mDialog.setMessage("Looking for a match...");
+					mDialog.setOnCancelListener(new OnCancelListener() {
+						@Override
+						public void onCancel(DialogInterface dialog)
+						{
+							new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+						}
+					});
+					mDialog.show();
+				}
 			}
 			
 		});

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 
 import com.pianist.battlelasers.AI.AIDifficulty;
 
+import android.content.Context;
 import android.graphics.Point;
 
 /**
@@ -45,6 +46,8 @@ public class Match
 	private boolean nextGameStarted;
 
 	public AIDifficulty computerDifficulty;
+	
+	public int onlineRating;
 
 	/**
 	 * Resets the match back to its initial parameters after the game is over,
@@ -207,6 +210,10 @@ public class Match
 	
 	public Layout getLayout(int id){
 		return layouts[id];
+	}
+	
+	public void loseOnlineGame() {
+		onlineRating -= 100;
 	}
 
 	/**

@@ -8,6 +8,7 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Bitmap.Config;
@@ -257,6 +258,26 @@ public class Graphics
 			paint.setStrokeWidth(3);
 		}
 		canvas.drawCircle(x, y, radius, paint);
+	}
+	
+	/**
+	 * Draws this given text on the canvas
+	 * 
+	 * @param x
+	 * 			 The x coordinate of the text
+	 * @param y
+	 * 			 The y coordinate of the text
+	 * @param size
+	 * 			 The size of the text
+	 * @param text
+	 * 		  	 The text to draw
+	 */
+	public void drawText(int x, int y, float size, String text) 
+	{
+		paint.setColor(Color.WHITE);
+		paint.setStyle(Style.FILL);
+		paint.setTextSize(size);
+		canvas.drawText(text, x, y, paint);
 	}
 
 	/**

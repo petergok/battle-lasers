@@ -329,13 +329,13 @@ public class GameScreen extends Screen
 				mainButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
 				if (mainButton.wasReleased())
 				{
-					disposeAnimationImages();
 					if (match.isOnline) 
 					{
 						new UnregisterPlayerTask(match.onlineUserId).execute();
 					}
 					Screen nextScreen = new MainMenuScreen(game, true, match);
 					game.setScreen(nextScreen);
+					disposeAnimationImages();
 				}
 
 				// Based on if the game is over and how games were played, show
@@ -374,16 +374,11 @@ public class GameScreen extends Screen
 							if (match.isOnline) 
 							{
 								new UnregisterPlayerTask(match.onlineUserId).execute();
-								Screen nextScreen = new MultiSetupScreen(game, true,
-										match);
-								game.setScreen(nextScreen);
-							} 
-							else 
-							{
-								Screen nextScreen = new GameSetupScreen(game, true,
-										match);
-								game.setScreen(nextScreen);
 							}
+								
+							Screen nextScreen = new GameSetupScreen(game, true,
+									match);
+							game.setScreen(nextScreen);
 						}
 					}
 					else

@@ -229,9 +229,16 @@ public class MainMenuScreen extends Screen
 
 				Assets.singleSetupBackground = g.newPixmap("SingleGameSetupScreen.png",
 						PixmapFormat.ARGB4444);
+				Assets.multiSetupBackground = g.newPixmap("MultiSetupScreen.png",
+						PixmapFormat.ARGB4444);
 				Assets.onSetupBackground = g.newPixmap("GameSetupScreenOn.png",
 						PixmapFormat.ARGB4444);
 				Assets.offSetupBackground = g.newPixmap("GameSetupScreenOff.png",
+						PixmapFormat.ARGB4444);
+				
+				Assets.matchSearchButtonNor = g.newPixmap("MatchSearchButtonNormal.png", 
+						PixmapFormat.ARGB4444);
+				Assets.matchSearchButtonClck = g.newPixmap("MatchSearchButtonClicked.png", 
 						PixmapFormat.ARGB4444);
 				
 				Assets.easyModeSelect = g.newPixmap("EasyModeSelect.png",
