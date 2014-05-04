@@ -29,8 +29,8 @@ public class InstructionsScreen extends Screen
 	private Button menuButton;
 
 	private Match match;
-
-	private boolean loadImages;
+	
+	private boolean mIsGuide;
 
 	/**
 	 * Creates the instruction screen according to the current page number and
@@ -45,14 +45,13 @@ public class InstructionsScreen extends Screen
 	 * @param loadImages
 	 *            A boolean of whether or not to load the images
 	 */
-	public InstructionsScreen(BattleLaserGame game, int number, Match match,
-			boolean loadImages)
+	public InstructionsScreen(BattleLaserGame game, int number, Match match, boolean isGuide)
 	{
 		super(game, match);
 		this.number = number;
-		this.loadImages = loadImages;
 		loaded = false;
 		this.match = match;
+		mIsGuide = isGuide;
 	}
 
 	/**
@@ -98,7 +97,7 @@ public class InstructionsScreen extends Screen
 			for (int event = 0; event < size; event++)
 			{
 				TouchEvent nextEvent = touchEvents.get(event);
-				if (number != 5)
+				if (number != 3 || mIsGuide)
 					rightButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
 				if (number != 1)
 					leftButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
@@ -116,16 +115,19 @@ public class InstructionsScreen extends Screen
 			}
 			else if (rightButton.wasReleased())
 			{
-				Screen nextScreen;
-				nextScreen = new InstructionsScreen(game, number + 1,
-							match, false);
-				game.setScreen(nextScreen);
+				if (mIsGuide && number == 3) {
+					Screen screen = new GameModeScreen(game, match);
+					game.setScreen(screen);
+				} else {
+					Screen nextScreen;
+					nextScreen = new InstructionsScreen(game, number + 1, match, mIsGuide);
+					game.setScreen(nextScreen);
+				}
 			}
 			else if (leftButton.wasReleased())
 			{
 				Screen nextScreen;
-				nextScreen = new InstructionsScreen(game, number - 1,
-							match, false);
+				nextScreen = new InstructionsScreen(game, number - 1, match, mIsGuide);
 				game.setScreen(nextScreen);
 			}
 		}
@@ -146,14 +148,10 @@ public class InstructionsScreen extends Screen
 			g.drawPixmap(Assets.gameInstructions1, 0, 0);
 		else if (number == 2)
 			g.drawPixmap(Assets.gameInstructions2, 0, 0);
-		else if (number == 3)
-			g.drawPixmap(Assets.gameInstructions3, 0, 0);
-		else if (number == 4)
-			g.drawPixmap(Assets.gameInstructions4, 0, 0);
 		else
-			g.drawPixmap(Assets.gameInstructions5, 0, 0);
+			g.drawPixmap(Assets.gameInstructions3, 0, 0);
 
-		if (number != 5)
+		if (number != 3)
 			rightButton.draw(g);
 		if (number != 1)
 			leftButton.draw(g);

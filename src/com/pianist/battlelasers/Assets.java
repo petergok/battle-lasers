@@ -211,10 +211,6 @@ public class Assets
 
 	public static Pixmap gameInstructions3;
 
-	public static Pixmap gameInstructions4;
-
-	public static Pixmap gameInstructions5;
-
 	public static Pixmap aboutBackground;
 
 	public static Pixmap aboutBackButtonClck;

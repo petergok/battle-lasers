@@ -63,7 +63,7 @@ public class Mirror
 	{
 		// Checks if the difference in tap times is less then half a second, if
 		// it is then the event counts as a double tap
-		if (tapTime - lastTapTime < 0.5)
+		if (tapTime - lastTapTime < 0.35)
 		{
 			lastTapTime = tapTime;
 			return true;

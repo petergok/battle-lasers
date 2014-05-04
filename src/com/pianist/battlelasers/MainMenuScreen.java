@@ -211,10 +211,7 @@ public class MainMenuScreen extends Screen
 						PixmapFormat.ARGB4444);
 				Assets.gameInstructions3 = g.newPixmap("Instructions3.png",
 						PixmapFormat.ARGB4444);
-				Assets.gameInstructions4 = g.newPixmap("Instructions4.png",
-						PixmapFormat.ARGB4444);
-				Assets.gameInstructions5 = g.newPixmap("Instructions5.png",
-						PixmapFormat.ARGB4444);
+				
 				Assets.rightButtonNor = g.newPixmap("RightButtonNormal.png",
 						PixmapFormat.ARGB4444);
 				Assets.rightButtonClck = g.newPixmap("RightButtonClicked.png",
@@ -310,12 +307,18 @@ public class MainMenuScreen extends Screen
 			// Change screens or state based on what button was pressed
 			if (playGameButton.wasReleased())
 			{
-				Screen screen = new GameModeScreen(game, match);
-				game.setScreen(screen);
+				if (game.isGuideCompleted) {
+					Screen screen = new GameModeScreen(game, match);
+					game.setScreen(screen);
+				} else {
+					game.guideStarted();
+					Screen screen = new InstructionsScreen(game, 1, match, true);
+					game.setScreen(screen);
+				}
 			}
 			if (instructionsButton.wasReleased())
 			{
-				Screen screen = new InstructionsScreen(game, 1, match, true);
+				Screen screen = new InstructionsScreen(game, 1, match, false);
 				game.setScreen(screen);
 			}
 			if (aboutButton.wasReleased())

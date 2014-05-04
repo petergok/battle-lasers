@@ -170,10 +170,7 @@ public class MultiSetupScreen extends Screen
 						PixmapFormat.ARGB4444);
 				Assets.gameInstructions3 = g.newPixmap("Instructions3.png",
 						PixmapFormat.ARGB4444);
-				Assets.gameInstructions4 = g.newPixmap("Instructions4.png",
-						PixmapFormat.ARGB4444);
-				Assets.gameInstructions5 = g.newPixmap("Instructions5.png",
-						PixmapFormat.ARGB4444);
+				
 				Assets.rightButtonNor = g.newPixmap("RightButtonNormal.png",
 						PixmapFormat.ARGB4444);
 				Assets.rightButtonClck = g.newPixmap("RightButtonClicked.png",

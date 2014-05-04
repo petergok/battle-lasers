@@ -90,6 +90,8 @@ public class BattleLaserGame extends Activity
 	
 	private Match mMatch;
 	
+	public boolean isGuideCompleted;
+	
 	// Preferences file
 	public static SharedPreferences settings;
 	public static final String BATTLE_LASERS_PREFS = "battle_lasers_prefs";
@@ -99,6 +101,7 @@ public class BattleLaserGame extends Activity
 	
 	public static final String PREF_RATING = "pref_rating";
 	public static final String PREF_USER_ID = "pref_user_id";
+	public static final String PREF_GUIDE_COMPLETED = "pref_guide_completed";
 	
 	public static int screenHeight;
 	
@@ -173,6 +176,7 @@ public class BattleLaserGame extends Activity
 		settings = getSharedPreferences(BATTLE_LASERS_PREFS, 0);
 	    mMatch.onlineRating = settings.getInt(PREF_RATING, 1000);
 	    mMatch.onlineUserId = settings.getInt(PREF_USER_ID, 0);
+	    isGuideCompleted = settings.getBoolean(PREF_GUIDE_COMPLETED, false);
 		screen = new MainMenuScreen(this, true, mMatch);
 		setContentView(renderView);
 		
@@ -203,6 +207,13 @@ public class BattleLaserGame extends Activity
 	    } else {
 	    	Log.i(TAG, "No valid Google Play Services APK found.");
 	    }
+	}
+	
+	public void guideStarted() {
+		SharedPreferences.Editor editor = settings.edit();
+	    editor.putBoolean(PREF_GUIDE_COMPLETED, true);
+	    editor.commit();
+	    isGuideCompleted = true;
 	}
 	
 	/**

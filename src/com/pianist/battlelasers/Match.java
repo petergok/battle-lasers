@@ -94,7 +94,7 @@ public class Match
 		currentLayout = null;
 		gameNumber = 1;
 		nextGameStarted = true;
-		computerDifficulty = AIDifficulty.Easy;
+		computerDifficulty = AIDifficulty.Medium;
 		timerOn = true;
 		matchStarted = false;
 		reset();
