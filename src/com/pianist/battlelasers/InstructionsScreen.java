@@ -151,7 +151,7 @@ public class InstructionsScreen extends Screen
 		else
 			g.drawPixmap(Assets.gameInstructions3, 0, 0);
 
-		if (number != 3)
+		if (number != 3 || mIsGuide)
 			rightButton.draw(g);
 		if (number != 1)
 			leftButton.draw(g);
