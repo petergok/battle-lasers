@@ -31,14 +31,19 @@ public class MultiSetupScreen extends Screen
 	}
 	
 	public void registeredUser(int id) {
-		game.showProgressDialog("Looking for a match...");
+		game.showProgressDialog("Looking for a match...", true);
 		match.onlineUserId = id;
 	}
 	
-	public void createdMatch(String otherPlayerName, int mapId, int playerNumber) {
-		game.dismissProgressDialog();
+	public void createdMatch(String otherPlayerName, int mapId, int playerNumber, int otherPlayerRating) {
+		game.showNewMatchDialog(otherPlayerName, otherPlayerRating);
 		match.playerNumberForOnline = playerNumber;
+		match.otherPlayerRating = otherPlayerRating;
+		match.otherPlayerName = otherPlayerName;
 		match.currentLayout = match.getLayout(mapId);
+	}
+	
+	public void startMatch() {
 		startingGame = true;
 		Screen screen = new GameScreen(game, match);
 		game.setScreen(screen);
@@ -271,7 +276,7 @@ public class MultiSetupScreen extends Screen
 			else if (matchSearchButton.wasReleased()) 
 			{
 				match.onlineUserId = BattleLaserGame.settings.getInt(BattleLaserGame.PREF_USER_ID, 0);
-				game.showProgressDialog("Connecting to server...");
+				game.showProgressDialog("Connecting to server...", true);
 				game.registerGCM();
 			}
 		}

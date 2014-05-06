@@ -200,6 +200,10 @@ public class GameScreen extends Screen
 		showMenu = false;
 		letRelease = false;
 		freezeTime = false;
+		
+		if (match.isOnline) {
+			game.showProgressDialog("Waiting for other player...", false);
+		}
 	}
 
 	/**

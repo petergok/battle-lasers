@@ -21,6 +21,10 @@ public class Match
 	
 	public boolean isOnline;
 	
+	public String otherPlayerName;
+	
+	public int otherPlayerRating;
+	
 	public int playerNumberForOnline;
 	
 	public int onlineUserId;
@@ -76,6 +80,8 @@ public class Match
 		numMirrors = 4;
 		turnLength = 30;
 		timerOn = true;
+		otherPlayerName = "Anonymous";
+		otherPlayerRating = 1000;
 	}
 
 	/**

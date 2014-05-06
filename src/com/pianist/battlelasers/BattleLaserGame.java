@@ -17,6 +17,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -97,6 +98,7 @@ public class BattleLaserGame extends Activity
 	public static final String BATTLE_LASERS_PREFS = "battle_lasers_prefs";
 	
 	public static final String MATCH_STARTED = "com.pianist.battlelasers.MATCH_STARTED";
+	public static final String MATCH_FOUND = "com.pianist.battlelasers.MATCH_FOUND";
 	public static final String MOVE = "com.pinaist.battlelasers.MOVE";
 	
 	public static final String PREF_RATING = "pref_rating";
@@ -108,12 +110,13 @@ public class BattleLaserGame extends Activity
 	private BroadcastReceiver bReceiver = new BroadcastReceiver() {
 	    @Override
 	    public void onReceive(Context context, Intent intent) {
-	        if(intent.getAction().equals(MATCH_STARTED)) {
+	        if(intent.getAction().equals(MATCH_FOUND)) {
 	        	String otherPlayerName = intent.getStringExtra("otherPlayerName");
 	        	int playerNumber = intent.getIntExtra("playerNumber", 0);
+	        	int otherPlayerRating = intent.getIntExtra("otherPlayerRating", 1000);
 	        	int mapId = intent.getIntExtra("mapId", 1);
 	        	if (screen instanceof MultiSetupScreen) {
-	    			((MultiSetupScreen) screen).createdMatch(otherPlayerName, mapId, playerNumber);
+	    			((MultiSetupScreen) screen).createdMatch(otherPlayerName, mapId, playerNumber, otherPlayerRating);
 	    		}
 	        } else if (intent.getAction().equals(MOVE)) {
 	        	Point moveStart = new Point(intent.getIntExtra("startRow", -1), intent.getIntExtra("startCol", -1));
@@ -470,7 +473,42 @@ public class BattleLaserGame extends Activity
 		}
 	}
 	
-	public void showProgressDialog(final String text) {
+	public void showNewMatchDialog(final String otherPlayerName, final int otherPlayerRating) {
+		final BattleLaserGame game = this;
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run()
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
+				String displayName = otherPlayerName;
+				if (displayName.length() >= 30) {
+					displayName = displayName.substring(0, 30) + "...";
+				}
+				builder.setTitle("Match found")
+					.setCancelable(false)
+					.setMessage("Player Name: " + displayName + "\n\n" + "Rating: " + otherPlayerRating)
+					.setPositiveButton("Accept", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which)
+						{
+							if (screen instanceof MultiSetupScreen) {
+								((MultiSetupScreen) screen).startMatch();
+				    		}
+						}
+					}).setNegativeButton("Decline", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which)
+						{
+							if (screen instanceof MultiSetupScreen) {
+								new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+				    		}
+						}
+					}).show();
+			}
+		});
+	}
+	
+	public void showProgressDialog(final String text, final boolean canceleable) {
 		final BattleLaserGame game = this;
 		runOnUiThread(new Runnable() {
 			@Override
@@ -483,6 +521,7 @@ public class BattleLaserGame extends Activity
 					mDialog.getWindow().setAttributes(wmlp);
 					mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 					mDialog.setMessage(text);
+					mDialog.setCancelable(canceleable);
 					mDialog.setOnCancelListener(new OnCancelListener() {
 						@Override
 						public void onCancel(DialogInterface dialog)
@@ -493,6 +532,7 @@ public class BattleLaserGame extends Activity
 					mDialog.show();
 				} else {
 					mDialog.setMessage(text);
+					mDialog.setCancelable(canceleable);
 					mDialog.setOnCancelListener(new OnCancelListener() {
 						@Override
 						public void onCancel(DialogInterface dialog)

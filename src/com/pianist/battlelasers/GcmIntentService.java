@@ -1,8 +1,5 @@
 package com.pianist.battlelasers;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import android.app.IntentService;
@@ -62,12 +59,14 @@ public class GcmIntentService extends IntentService {
     		if (messageType == null) {
     			return;
     		}
-    		if (messageType.equals("startMatch")) {
+    		if (messageType.equals("matchFound")) {
     			String otherPlayerName = data.getString("otherPlayerName");
     			int playerNumber = Integer.parseInt(data.getString("playerNumber"));
     			int mapId = Integer.parseInt(data.getString("mapId"));
-    			Intent intent = new Intent(BattleLaserGame.MATCH_STARTED);
+    			int otherPlayerRating = Integer.parseInt(data.getString("playerRating"));
+    			Intent intent = new Intent(BattleLaserGame.MATCH_FOUND);
     			intent.putExtra("otherPlayerName", otherPlayerName);
+    			intent.putExtra("otherPlayerRating", otherPlayerRating);
     			intent.putExtra("playerNumber", playerNumber);
     			intent.putExtra("mapId", mapId);
     			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
@@ -83,6 +82,9 @@ public class GcmIntentService extends IntentService {
     			intent.putExtra("endRow", endRow);
     			intent.putExtra("endCol", endCol);
     			intent.putExtra("turnRight", turnRight);
+    			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    		} else if (messageType.equals("matchStart")) {
+    			Intent intent = new Intent(BattleLaserGame.MATCH_STARTED);
     			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     		}
     		
