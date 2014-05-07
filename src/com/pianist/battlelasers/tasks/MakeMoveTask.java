@@ -1,4 +1,4 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.tasks;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,40 +15,51 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 
+import com.pianist.battlelasers.activities.BattleLaserGame;
+
+import android.graphics.Point;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
+public class MakeMoveTask extends AsyncTask<Void, Void, String>
 {
-	private BattleLaserGame mActivity;
-	private String mRegId;
-	private int mRating;
+	private Point mLastMoveStart;
+	private Point mLastMoveEnd;
+	private boolean mTurnRight;
+	private int mPlayerId;
 	
-	public SendRegistrationIdTask(BattleLaserGame activity, String regId, int rating) {
-		mRegId = regId;
-		mRating = rating;
-		mActivity = activity;
+	public MakeMoveTask(Point lastMoveStart, Point lastMoveEnd, boolean turnRight, int playerId) {
+		mLastMoveStart = lastMoveStart;
+		mLastMoveEnd = lastMoveEnd;
+		mTurnRight = turnRight;
+		mPlayerId = playerId;
 	}
 	
 	@Override
 	protected String doInBackground(Void... args)
-	{	
+	{
 		HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = "none";
-        String uri = BattleLaserGame.BASE_URL + "/player";
+        String uri = BattleLaserGame.BASE_URL + "/player/" + mPlayerId + "/move";
         try {
         	HttpPut method = new HttpPut(uri);
         	
-        	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("registrationId", mRegId));
-            nameValuePairs.add(new BasicNameValuePair("rating", "" + mRating));
+        	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(4);
+        	if (mLastMoveStart == null) {
+        		mLastMoveStart = new Point (-1, -1);
+        	}
+        	if (mLastMoveEnd == null) {
+        		mLastMoveEnd = new Point (-1, -1);
+        	}
+            nameValuePairs.add(new BasicNameValuePair("startRow", "" + mLastMoveStart.x));
+            nameValuePairs.add(new BasicNameValuePair("startCol", "" + mLastMoveStart.y));
+            nameValuePairs.add(new BasicNameValuePair("endRow", "" + mLastMoveEnd.x));
+            nameValuePairs.add(new BasicNameValuePair("endCol", "" + mLastMoveEnd.y));
+            nameValuePairs.add(new BasicNameValuePair("turnRight", "" + mTurnRight));
             method.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-        	
+
             response = httpclient.execute(method);
             StatusLine statusLine = response.getStatusLine();
             if(statusLine.getStatusCode() == HttpStatus.SC_OK){
@@ -56,14 +67,15 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
                 response.getEntity().writeTo(out);
                 out.close();
                 responseString = out.toString();
-            } else {
+            } else{
                 //Closes the connection.
                 response.getEntity().getContent().close();
                 throw new IOException(statusLine.getReasonPhrase());
             }
         } catch (ClientProtocolException e) {
+            //TODO Handle problems..
         } catch (IOException e) {
-        	mActivity.checkNetworkConnection();
+            //TODO Handle problems..
         }
         return responseString;
 	}
@@ -71,22 +83,7 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
 	@Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        int id = getId(result);
-        if (id >= 0) {
-        	mActivity.registeredUser(id);
-        }
         Log.d("RESPONSE", result);
     }
-	
-	private static int getId(String s) {
-		int id = -1;
-	    try { 
-	        id = Integer.parseInt(s); 
-	    } catch(NumberFormatException e) { 
-	        return -1; 
-	    }
-	    // only got here if we didn't return false
-	    return id;
-	}
 }
 

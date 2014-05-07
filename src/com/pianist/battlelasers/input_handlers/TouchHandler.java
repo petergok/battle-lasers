@@ -1,10 +1,12 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.input_handlers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.pianist.battlelasers.Input.TouchEvent;
+import com.pianist.battlelasers.Pool;
 import com.pianist.battlelasers.Pool.PoolObjectFactory;
+import com.pianist.battlelasers.input_handlers.Input.TouchEvent;
+
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;

@@ -1,4 +1,4 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.tasks;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -11,15 +11,16 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class UnregisterPlayerTask extends AsyncTask<Void, Void, String>
+import com.pianist.battlelasers.activities.BattleLaserGame;
+
+public class DeclineMatchTask extends AsyncTask<Void, Void, String>
 {
 	private int mPlayerId;
 	
-	public UnregisterPlayerTask(int playerId) {
+	public DeclineMatchTask(int playerId) {
 		mPlayerId = playerId;
 	}
 	
@@ -29,7 +30,7 @@ public class UnregisterPlayerTask extends AsyncTask<Void, Void, String>
 		HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = "none";
-        String uri = BattleLaserGame.BASE_URL + "/player/" + mPlayerId;
+        String uri = BattleLaserGame.BASE_URL + "/player/" + mPlayerId + "/decline";
         try {
         	HttpDelete method = new HttpDelete(uri);
         	
@@ -56,10 +57,6 @@ public class UnregisterPlayerTask extends AsyncTask<Void, Void, String>
 	@Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        SharedPreferences.Editor editor = BattleLaserGame.settings.edit();
-	    editor.putInt(BattleLaserGame.PREF_USER_ID, 0);
-	    editor.commit();
         Log.d("RESPONSE", result);
     }
 }
-

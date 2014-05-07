@@ -1,8 +1,8 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.game_objects;
 
 import java.util.LinkedList;
 
-import com.pianist.battlelasers.AI.AIDifficulty;
+import com.pianist.battlelasers.game_objects.AI.AIDifficulty;
 
 import android.content.Context;
 import android.graphics.Point;

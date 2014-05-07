@@ -1,4 +1,4 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.game_objects;
 
 import java.util.ArrayList;
 import java.util.List;

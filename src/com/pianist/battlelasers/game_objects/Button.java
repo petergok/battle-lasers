@@ -1,6 +1,9 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.game_objects;
 
-import com.pianist.battlelasers.Input.TouchEvent;
+import com.pianist.battlelasers.graphics.Graphics;
+import com.pianist.battlelasers.graphics.Pixmap;
+import com.pianist.battlelasers.input_handlers.Input.TouchEvent;
+
 import android.graphics.Rect;
 
 /**

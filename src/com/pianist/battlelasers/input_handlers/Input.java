@@ -1,4 +1,4 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.input_handlers;
 
 import java.util.List;
 

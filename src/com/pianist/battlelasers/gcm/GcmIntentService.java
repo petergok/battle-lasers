@@ -1,6 +1,7 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.gcm;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.pianist.battlelasers.activities.BattleLaserGame;
 
 import android.app.IntentService;
 import android.content.Intent;
@@ -84,7 +85,10 @@ public class GcmIntentService extends IntentService {
     			intent.putExtra("turnRight", turnRight);
     			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     		} else if (messageType.equals("matchStart")) {
-    			Intent intent = new Intent(BattleLaserGame.MATCH_STARTED);
+    			Intent intent = new Intent(BattleLaserGame.MATCH_START);
+    			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    		} else if (messageType.equals("matchEnd")) {
+    			Intent intent = new Intent(BattleLaserGame.MATCH_END);
     			LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     		}
     		

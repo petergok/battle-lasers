@@ -1,12 +1,13 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.input_handlers;
 
 import java.util.ArrayList;
 import java.util.List;
 import android.view.View;
 import android.view.View.OnKeyListener;
 
-import com.pianist.battlelasers.Input.KeyEvent;
+import com.pianist.battlelasers.Pool;
 import com.pianist.battlelasers.Pool.PoolObjectFactory;
+import com.pianist.battlelasers.input_handlers.Input.KeyEvent;
 
 /**
  * The KeyboardHandler class reads user input through keyboard button presses

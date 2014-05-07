@@ -1,10 +1,24 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.activities;
 
 import java.io.IOException;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
+import com.pianist.battlelasers.FileIO;
+import com.pianist.battlelasers.game_objects.Match;
+import com.pianist.battlelasers.graphics.Graphics;
+import com.pianist.battlelasers.graphics.Pixmap;
+import com.pianist.battlelasers.graphics.RenderGraphics;
+import com.pianist.battlelasers.input_handlers.Input;
+import com.pianist.battlelasers.screens.GameScreen;
+import com.pianist.battlelasers.screens.MainMenuScreen;
+import com.pianist.battlelasers.screens.MultiSetupScreen;
+import com.pianist.battlelasers.screens.Screen;
+import com.pianist.battlelasers.tasks.AcceptMatchTask;
+import com.pianist.battlelasers.tasks.DeclineMatchTask;
+import com.pianist.battlelasers.tasks.SendRegistrationIdTask;
+import com.pianist.battlelasers.tasks.UnregisterPlayerTask;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -97,8 +111,9 @@ public class BattleLaserGame extends Activity
 	public static SharedPreferences settings;
 	public static final String BATTLE_LASERS_PREFS = "battle_lasers_prefs";
 	
-	public static final String MATCH_STARTED = "com.pianist.battlelasers.MATCH_STARTED";
+	public static final String MATCH_START = "com.pianist.battlelasers.MATCH_START";
 	public static final String MATCH_FOUND = "com.pianist.battlelasers.MATCH_FOUND";
+	public static final String MATCH_END = "com.pianist.battlelasers.MATCH_END";
 	public static final String MOVE = "com.pinaist.battlelasers.MOVE";
 	
 	public static final String PREF_RATING = "pref_rating";
@@ -129,6 +144,15 @@ public class BattleLaserGame extends Activity
 	        	}
 	        	if (screen instanceof GameScreen) {
 	        		((GameScreen) screen).onlineMoveMade(moveStart, moveEnd, turnRight);
+	        	}
+	        } else if (intent.getAction().equals(MATCH_END)) {
+	        	if (!mMatch.matchStarted) {
+	        		showUserDeclinedDialog();
+	        	}
+	        } else if (intent.getAction().equals(MATCH_START)) {
+	        	if (screen instanceof GameScreen) {
+	        		dismissProgressDialog();
+	        		((GameScreen) screen).startOnlineMatch();
 	        	}
 	        }
 	    }
@@ -187,8 +211,10 @@ public class BattleLaserGame extends Activity
 		
 		LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
 		IntentFilter intentFilter = new IntentFilter();
-		intentFilter.addAction(MATCH_STARTED);
+		intentFilter.addAction(MATCH_START);
 		intentFilter.addAction(MOVE);
+		intentFilter.addAction(MATCH_FOUND);
+		intentFilter.addAction(MATCH_END);
 		bManager.registerReceiver(bReceiver, intentFilter);
 	}
 	
@@ -491,6 +517,7 @@ public class BattleLaserGame extends Activity
 						@Override
 						public void onClick(DialogInterface dialog, int which)
 						{
+							new AcceptMatchTask(mMatch.onlineUserId).execute();
 							if (screen instanceof MultiSetupScreen) {
 								((MultiSetupScreen) screen).startMatch();
 				    		}
@@ -500,8 +527,30 @@ public class BattleLaserGame extends Activity
 						public void onClick(DialogInterface dialog, int which)
 						{
 							if (screen instanceof MultiSetupScreen) {
-								new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+								new DeclineMatchTask(mMatch.onlineUserId).execute();
 				    		}
+						}
+					}).show();
+			}
+		});
+	}
+	
+	public void showUserDeclinedDialog() {
+		final BattleLaserGame game = this;
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run()
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
+				builder.setTitle("Match found")
+					.setCancelable(false)
+					.setMessage("Other player declined the match.")
+					.setPositiveButton("OK", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which)
+						{
+							registerGCM();
+							game.showProgressDialog("Connecting to server...", true);
 						}
 					}).show();
 			}

@@ -1,4 +1,4 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.gcm;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;

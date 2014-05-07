@@ -1,10 +1,17 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.screens;
 
 import java.util.List;
 
-import com.pianist.battlelasers.Graphics.PixmapFormat;
-import com.pianist.battlelasers.Input.KeyEvent;
-import com.pianist.battlelasers.Input.TouchEvent;
+import com.pianist.battlelasers.Assets;
+import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.game_objects.Button;
+import com.pianist.battlelasers.game_objects.Match;
+import com.pianist.battlelasers.graphics.Graphics;
+import com.pianist.battlelasers.graphics.Pixmap;
+import com.pianist.battlelasers.graphics.Graphics.PixmapFormat;
+import com.pianist.battlelasers.input_handlers.Input;
+import com.pianist.battlelasers.input_handlers.Input.KeyEvent;
+import com.pianist.battlelasers.input_handlers.Input.TouchEvent;
 
 public class MultiSetupScreen extends Screen
 {

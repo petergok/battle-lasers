@@ -1,4 +1,7 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.game_objects;
+
+import com.pianist.battlelasers.Assets;
+import com.pianist.battlelasers.graphics.Graphics;
 
 import android.graphics.Point;
 

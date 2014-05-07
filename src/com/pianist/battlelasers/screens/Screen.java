@@ -1,4 +1,7 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.screens;
+
+import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.game_objects.Match;
 
 /**
  * The Screen class defines a general Screen that would be presented in the game

@@ -1,4 +1,6 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.graphics;
+
+import com.pianist.battlelasers.activities.BattleLaserGame;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;

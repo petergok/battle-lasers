@@ -1,4 +1,4 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.input_handlers;
 
 import android.content.Context;
 import android.hardware.Sensor;

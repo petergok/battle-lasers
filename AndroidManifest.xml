@@ -27,7 +27,7 @@
            android:value="@integer/google_play_services_version" />
         
         <activity
-            android:name="com.pianist.battlelasers.BattleLaserGame"
+            android:name="com.pianist.battlelasers.activities.BattleLaserGame"
             android:label="@string/app_name" android:screenOrientation="portrait" android:configChanges="orientation" android:icon="@drawable/ic_launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -36,14 +36,14 @@
             </intent-filter>
         </activity>
         <receiver
-            android:name=".GcmBroadcastReceiver"
+            android:name="com.pianist.battlelasers.gcm.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
                 <category android:name="com.pianist.battlelasers" />
             </intent-filter>
         </receiver>
-        <service android:name=".GcmIntentService" />
+   com.pianist.battlelasers.gcm.GcmIntentServiceroid:name=".GcmIntentService" />
     </application>
 
 </manifest>

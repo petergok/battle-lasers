@@ -1,6 +1,6 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.graphics;
 
-import com.pianist.battlelasers.Graphics.PixmapFormat;
+import com.pianist.battlelasers.graphics.Graphics.PixmapFormat;
 
 import android.graphics.Bitmap;
 

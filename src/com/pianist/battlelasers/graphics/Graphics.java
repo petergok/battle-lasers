@@ -1,4 +1,4 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.graphics;
 
 import java.io.IOException;
 

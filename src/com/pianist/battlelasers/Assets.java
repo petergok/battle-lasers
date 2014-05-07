@@ -1,5 +1,7 @@
 package com.pianist.battlelasers;
 
+import com.pianist.battlelasers.graphics.Pixmap;
+
 /**
  * Assets class is used to contain all the images for the game as public static
  * variables, so that they can be recovered and used easily

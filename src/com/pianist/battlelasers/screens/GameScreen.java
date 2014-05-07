@@ -1,13 +1,26 @@
-package com.pianist.battlelasers;
+package com.pianist.battlelasers.screens;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.pianist.battlelasers.Graphics.PixmapFormat;
-import com.pianist.battlelasers.Input.KeyEvent;
-import com.pianist.battlelasers.Input.TouchEvent;
-import com.pianist.battlelasers.Match.Layout;
+import com.pianist.battlelasers.Assets;
+import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.game_objects.AI;
+import com.pianist.battlelasers.game_objects.Button;
+import com.pianist.battlelasers.game_objects.LaserGun;
+import com.pianist.battlelasers.game_objects.Match;
+import com.pianist.battlelasers.game_objects.Mirror;
+import com.pianist.battlelasers.game_objects.Move;
+import com.pianist.battlelasers.game_objects.Match.Layout;
+import com.pianist.battlelasers.graphics.Graphics;
+import com.pianist.battlelasers.graphics.Pixmap;
+import com.pianist.battlelasers.graphics.Graphics.PixmapFormat;
+import com.pianist.battlelasers.input_handlers.Input;
+import com.pianist.battlelasers.input_handlers.Input.KeyEvent;
+import com.pianist.battlelasers.input_handlers.Input.TouchEvent;
+import com.pianist.battlelasers.tasks.MakeMoveTask;
+import com.pianist.battlelasers.tasks.UnregisterPlayerTask;
 
 import android.graphics.Color;
 import android.graphics.Point;
@@ -200,10 +213,6 @@ public class GameScreen extends Screen
 		showMenu = false;
 		letRelease = false;
 		freezeTime = false;
-		
-		if (match.isOnline) {
-			game.showProgressDialog("Waiting for other player...", false);
-		}
 	}
 
 	/**
@@ -2454,6 +2463,9 @@ public class GameScreen extends Screen
 			loadPlayImages(g);
 			turnStart = timeSinceStart;
 			state = GameState.TapToStart;
+			if (match.isOnline) {
+				game.showProgressDialog("Waiting for other player...", false);
+			}
 		}
 	}
 
@@ -2746,8 +2758,10 @@ public class GameScreen extends Screen
 		{
 			presentGameScreen();
 			Graphics g = game.getGraphics();
-			g.drawPixmap(Assets.tapToStart,
-					240 - Assets.tapToStart.getWidth() / 2, 285);
+			if (!match.isOnline) {
+				g.drawPixmap(Assets.tapToStart,
+						240 - Assets.tapToStart.getWidth() / 2, 285);
+			}
 		}
 		else if (state == GameState.TimeRanOut)
 		{
@@ -2838,5 +2852,10 @@ public class GameScreen extends Screen
 			game.disposeImage(Assets.winningAnimation[animation - 1]);
 		}
 		Assets.winningAnimation = null;
+	}
+	
+	public void startOnlineMatch() {
+		state = GameState.Running;
+		match.matchStarted = true;
 	}
 }
