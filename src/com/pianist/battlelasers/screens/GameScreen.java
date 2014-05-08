@@ -427,7 +427,7 @@ public class GameScreen extends Screen
 					{
 						nextButton.click(nextEvent.x, nextEvent.y,
 								nextEvent.type);
-						if (nextButton.wasReleased())
+						if (!match.isOnline && nextButton.wasReleased())
 						{
 							match.nextGame();
 							Screen nextScreen = new GameScreen(game, match);

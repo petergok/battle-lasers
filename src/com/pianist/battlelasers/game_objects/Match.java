@@ -55,6 +55,8 @@ public class Match
 	
 	public boolean matchStarted;
 	
+	public boolean endMatch;
+	
 	public boolean showDialogs;
 
 	/**
@@ -71,6 +73,7 @@ public class Match
 		isOnline = false;
 		matchStarted = false;
 		showDialogs = false;
+		endMatch = false;
 	}
 	
 	public void resetOnline()
@@ -228,11 +231,13 @@ public class Match
 	
 	public void loseOnlineGame() {
 		matchStarted = false;
+		endMatch = true;
 		onlineRating -= 100;
 	}
 	
 	public void winOnlineGame() {
 		matchStarted = false;
+		endMatch = true;
 		onlineRating += 100;
 	}
 

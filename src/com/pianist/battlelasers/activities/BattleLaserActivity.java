@@ -150,7 +150,7 @@ public class BattleLaserActivity extends Activity
 	        	}
 	        } else if (intent.getAction().equals(MATCH_END)) {
 	        	new UnregisterPlayerTask(mMatch.onlineUserId).execute();
-	        	if (!mMatch.matchStarted && (screen instanceof MultiSetupScreen || screen instanceof GameScreen)) {
+	        	if (!mMatch.matchStarted && !mMatch.endMatch && (screen instanceof MultiSetupScreen || screen instanceof GameScreen)) {
 	        		showUserDeclinedDialog();
 	        	} else if (mMatch.matchStarted) {
 	        		showUserForfeitDialog();
