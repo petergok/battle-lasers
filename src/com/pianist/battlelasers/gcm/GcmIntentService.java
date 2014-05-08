@@ -64,7 +64,7 @@ public class GcmIntentService extends IntentService {
     			String otherPlayerName = data.getString("otherPlayerName");
     			int playerNumber = Integer.parseInt(data.getString("playerNumber"));
     			int mapId = Integer.parseInt(data.getString("mapId"));
-    			int otherPlayerRating = Integer.parseInt(data.getString("playerRating"));
+    			int otherPlayerRating = Integer.parseInt(data.getString("otherPlayerRating"));
     			Intent intent = new Intent(BattleLaserGame.MATCH_FOUND);
     			intent.putExtra("otherPlayerName", otherPlayerName);
     			intent.putExtra("otherPlayerRating", otherPlayerRating);

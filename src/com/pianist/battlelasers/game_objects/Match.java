@@ -54,6 +54,8 @@ public class Match
 	public int onlineRating;
 	
 	public boolean matchStarted;
+	
+	public boolean showDialogs;
 
 	/**
 	 * Resets the match back to its initial parameters after the game is over,
@@ -68,6 +70,7 @@ public class Match
 		nextGameStarted = true;
 		isOnline = false;
 		matchStarted = false;
+		showDialogs = false;
 	}
 	
 	public void resetOnline()
@@ -225,6 +228,10 @@ public class Match
 	
 	public void loseOnlineGame() {
 		onlineRating -= 100;
+	}
+	
+	public void winOnlineGame() {
+		onlineRating += 100;
 	}
 
 	/**

@@ -34,6 +34,8 @@ public class MultiSetupScreen extends Screen
 		this.match = match;
 		this.loadImages = loadImages;
 		
+		startingGame = false;
+		
 		loaded = false;
 	}
 	
@@ -43,6 +45,7 @@ public class MultiSetupScreen extends Screen
 	}
 	
 	public void createdMatch(String otherPlayerName, int mapId, int playerNumber, int otherPlayerRating) {
+		game.dismissProgressDialog();
 		game.showNewMatchDialog(otherPlayerName, otherPlayerRating);
 		match.playerNumberForOnline = playerNumber;
 		match.otherPlayerRating = otherPlayerRating;
@@ -292,16 +295,21 @@ public class MultiSetupScreen extends Screen
 	@Override
 	public void present(float deltaTime)
 	{
-		Graphics g = game.getGraphics();
-
-		// Draw the background
-		g.drawPixmap(Assets.background, 0, 0);
-		g.drawPixmap(Assets.multiSetupBackground, 0, 0);
+		if (!startingGame) {
+			try {
+				Graphics g = game.getGraphics();
 		
-		leftButton.draw(g);
-		matchSearchButton.draw(g);
-		int ratingPosition = (match.onlineRating >= 1000) ? 270 : 300;
-		g.drawText(ratingPosition, 650, 60, "" + match.onlineRating);
+				// Draw the background
+				g.drawPixmap(Assets.background, 0, 0);
+				g.drawPixmap(Assets.multiSetupBackground, 0, 0);
+				
+				leftButton.draw(g);
+				matchSearchButton.draw(g);
+				int ratingPosition = (match.onlineRating >= 1000) ? 270 : 300;
+				g.drawText(ratingPosition, 650, 60, "" + match.onlineRating);
+			} catch (Exception e) {
+			}
+		}
 	}
 
 	@Override

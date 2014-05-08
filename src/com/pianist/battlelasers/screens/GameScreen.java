@@ -121,6 +121,8 @@ public class GameScreen extends Screen
 
 	// The state of the game
 	private GameState state;
+	
+	private boolean loadedImages;
 
 	/**
 	 * The GameState describes all the states that the game could be in
@@ -146,6 +148,8 @@ public class GameScreen extends Screen
 	public GameScreen(BattleLaserGame game, Match match)
 	{
 		super(game, match);
+		
+		loadedImages = false;
 
 		this.match = match;
 		grid = new Mirror[12][8];
@@ -348,6 +352,7 @@ public class GameScreen extends Screen
 					if (match.isOnline) 
 					{
 						new UnregisterPlayerTask(match.onlineUserId).execute();
+						match.showDialogs = false;
 					}
 					Screen nextScreen = new MainMenuScreen(game, true, match);
 					game.setScreen(nextScreen);
@@ -390,11 +395,15 @@ public class GameScreen extends Screen
 							if (match.isOnline) 
 							{
 								new UnregisterPlayerTask(match.onlineUserId).execute();
+								match.showDialogs = false;
+								Screen nextScreen = new MultiSetupScreen(game, true,
+										match);
+								game.setScreen(nextScreen);
+							} else {
+								Screen nextScreen = new GameSetupScreen(game, true,
+										match);
+								game.setScreen(nextScreen);
 							}
-								
-							Screen nextScreen = new GameSetupScreen(game, true,
-									match);
-							game.setScreen(nextScreen);
 						}
 					}
 					else
@@ -2109,10 +2118,17 @@ public class GameScreen extends Screen
 		winStartTime = timeSinceStart;
 		laserDrawEnd = timeSinceStart;
 		showWinner = true;
-		if (playerOneTurn)
+		if (playerOneTurn) {
 			match.playerOneScore++;
-		else
+			if (match.isOnline) {
+				game.winOnlineGame();
+			}
+		} else {
 			match.playerTwoScore++;
+			if (match.isOnline) {
+				game.loseOnlineGame();
+			}
+		}
 		if (match.isOnline && playerOneTurn) {
 			new MakeMoveTask(null, null, playerOne.getDirection() == 2, match.onlineUserId).execute();
 		}
@@ -2337,8 +2353,13 @@ public class GameScreen extends Screen
 	 *            The time since the last updating of the screen
 	 */
 	private void presentAnimation(float deltaTime)
-	{
+	{	
 		Graphics g = game.getGraphics();
+		
+		if (!loadedImages) {
+			loadedImages = true;
+			loadPlayImages(g);
+		}
 
 		g.drawPixmap(Assets.gameBackground, 0, 0);
 
@@ -2460,7 +2481,6 @@ public class GameScreen extends Screen
 		// Change game states if the animation is finished
 		if (timeSinceStart >= 1.3)
 		{
-			loadPlayImages(g);
 			turnStart = timeSinceStart;
 			state = GameState.TapToStart;
 			if (match.isOnline) {

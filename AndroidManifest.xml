@@ -43,7 +43,7 @@
                 <category android:name="com.pianist.battlelasers" />
             </intent-filter>
         </receiver>
-   com.pianist.battlelasers.gcm.GcmIntentServiceroid:name=".GcmIntentService" />
+   		<service android:name="com.pianist.battlelasers.gcm.GcmIntentService" />
     </application>
 
 </manifest>

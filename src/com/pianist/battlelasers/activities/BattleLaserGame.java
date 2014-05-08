@@ -101,7 +101,9 @@ public class BattleLaserGame extends Activity
 	// Context
 	private Context mContext;
 	
-	private ProgressDialog mDialog;
+	private ProgressDialog mProgressDialog;
+	
+	private AlertDialog mAlertDialog;
 	
 	private Match mMatch;
 	
@@ -146,9 +148,15 @@ public class BattleLaserGame extends Activity
 	        		((GameScreen) screen).onlineMoveMade(moveStart, moveEnd, turnRight);
 	        	}
 	        } else if (intent.getAction().equals(MATCH_END)) {
-	        	if (!mMatch.matchStarted) {
+	        	new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+	        	if (!mMatch.matchStarted && (screen instanceof MultiSetupScreen || screen instanceof GameScreen)) {
 	        		showUserDeclinedDialog();
+	        	} else if (mMatch.matchStarted) {
+	        		showUserForfeitDialog();
 	        	}
+	        	SharedPreferences.Editor editor = BattleLaserGame.settings.edit();
+	    	    editor.putInt(BattleLaserGame.PREF_USER_ID, 0);
+	    	    editor.commit();
 	        } else if (intent.getAction().equals(MATCH_START)) {
 	        	if (screen instanceof GameScreen) {
 	        		dismissProgressDialog();
@@ -383,15 +391,27 @@ public class BattleLaserGame extends Activity
 	@Override
 	public void onStop() {
 		if (mMatch != null && mMatch.onlineUserId != 0 && mMatch.matchStarted) {
-			mMatch.loseOnlineGame();
-			SharedPreferences.Editor editor = settings.edit();
-		    editor.putInt(PREF_RATING, mMatch.onlineRating);
-		    editor.commit();
+			loseOnlineGame();
 			new UnregisterPlayerTask(mMatch.onlineUserId).execute();
 		} else if (mMatch != null && mMatch.isOnline) {
 			new UnregisterPlayerTask(mMatch.onlineUserId).execute();
 		}
+		mMatch.showDialogs = false;
 		super.onStop();
+	}
+	
+	public void loseOnlineGame() {
+		mMatch.loseOnlineGame();
+		SharedPreferences.Editor editor = settings.edit();
+	    editor.putInt(PREF_RATING, mMatch.onlineRating);
+	    editor.commit();
+	}
+	
+	public void winOnlineGame() {
+		mMatch.winOnlineGame();
+		SharedPreferences.Editor editor = settings.edit();
+	    editor.putInt(PREF_RATING, mMatch.onlineRating);
+	    editor.commit();
 	}
 
 	/**
@@ -489,6 +509,7 @@ public class BattleLaserGame extends Activity
 	}
 	
 	public void registeredUser(int userId) {
+		mMatch.showDialogs = true;
 		SharedPreferences.Editor editor = settings.edit();
 	    editor.putInt(PREF_USER_ID, userId);
 	    editor.commit();
@@ -500,7 +521,12 @@ public class BattleLaserGame extends Activity
 	}
 	
 	public void showNewMatchDialog(final String otherPlayerName, final int otherPlayerRating) {
+		if (!mMatch.showDialogs) {
+			return;
+		}
+		
 		final BattleLaserGame game = this;
+		dismissDialogs();
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run()
@@ -510,7 +536,7 @@ public class BattleLaserGame extends Activity
 				if (displayName.length() >= 30) {
 					displayName = displayName.substring(0, 30) + "...";
 				}
-				builder.setTitle("Match found")
+				mAlertDialog = builder.setTitle("Match found")
 					.setCancelable(false)
 					.setMessage("Player Name: " + displayName + "\n\n" + "Rating: " + otherPlayerRating)
 					.setPositiveButton("Accept", new OnClickListener() {
@@ -529,80 +555,141 @@ public class BattleLaserGame extends Activity
 							if (screen instanceof MultiSetupScreen) {
 								new DeclineMatchTask(mMatch.onlineUserId).execute();
 				    		}
+							mMatch.showDialogs = false;
 						}
-					}).show();
+					}).create();
+				mAlertDialog.show();
 			}
 		});
 	}
 	
 	public void showUserDeclinedDialog() {
+		if (!mMatch.showDialogs) {
+			return;
+		}
+		
 		final BattleLaserGame game = this;
+		dismissDialogs();
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run()
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
-				builder.setTitle("Match found")
+				mAlertDialog = builder.setTitle("Match found")
 					.setCancelable(false)
 					.setMessage("Other player declined the match.")
 					.setPositiveButton("OK", new OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which)
 						{
+							if (screen instanceof GameScreen) {
+								Screen nextScreen = new MultiSetupScreen(game, true,
+										mMatch);
+								game.setScreen(nextScreen);
+							}
 							registerGCM();
 							game.showProgressDialog("Connecting to server...", true);
 						}
-					}).show();
+					}).create();
+				mAlertDialog.show();
+			}
+		});
+	}
+	
+	public void showUserForfeitDialog() {
+		if (!mMatch.showDialogs) {
+			return;
+		}
+		
+		final BattleLaserGame game = this;
+		dismissDialogs();
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run()
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
+				mAlertDialog = builder.setTitle("Match found")
+					.setCancelable(false)
+					.setMessage("Other player forfeit, you win!")
+					.setPositiveButton("OK", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which)
+						{
+							if (screen instanceof GameScreen) {
+								Screen nextScreen = new MultiSetupScreen(game, true,
+										mMatch);
+								game.setScreen(nextScreen);
+								winOnlineGame();
+							}
+							registerGCM();
+							game.showProgressDialog("Connecting to server...", true);
+						}
+					}).create();
+				mAlertDialog.show();
 			}
 		});
 	}
 	
 	public void showProgressDialog(final String text, final boolean canceleable) {
 		final BattleLaserGame game = this;
+		dismissAlertDialog();
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run()
 			{
-				if (mDialog == null || !mDialog.isShowing()) {
-					mDialog = new ProgressDialog(game, ProgressDialog.THEME_HOLO_DARK);
-					WindowManager.LayoutParams wmlp = mDialog.getWindow().getAttributes();
+				if (mProgressDialog == null || !mProgressDialog.isShowing()) {
+					mProgressDialog = new ProgressDialog(game, ProgressDialog.THEME_HOLO_DARK);
+					WindowManager.LayoutParams wmlp = mProgressDialog.getWindow().getAttributes();
 					wmlp.y = screenHeight / 18;
-					mDialog.getWindow().setAttributes(wmlp);
-					mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-					mDialog.setMessage(text);
-					mDialog.setCancelable(canceleable);
-					mDialog.setOnCancelListener(new OnCancelListener() {
+					mProgressDialog.getWindow().setAttributes(wmlp);
+					mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+					mProgressDialog.setMessage(text);
+					mProgressDialog.setCancelable(canceleable);
+					mProgressDialog.setOnCancelListener(new OnCancelListener() {
 						@Override
 						public void onCancel(DialogInterface dialog)
 						{
 							new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+							mMatch.showDialogs = false;
 						}
 					});
-					mDialog.show();
+					mProgressDialog.show();
 				} else {
-					mDialog.setMessage(text);
-					mDialog.setCancelable(canceleable);
-					mDialog.setOnCancelListener(new OnCancelListener() {
+					mProgressDialog.setMessage(text);
+					mProgressDialog.setCancelable(canceleable);
+					mProgressDialog.setOnCancelListener(new OnCancelListener() {
 						@Override
 						public void onCancel(DialogInterface dialog)
 						{
 							new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+							mMatch.showDialogs = false;
 						}
 					});
-					mDialog.show();
+					mProgressDialog.show();
 				}
 			}
 		});
 	}
 	
 	public void dismissProgressDialog() {
-		if (mDialog != null) {
-			mDialog.dismiss();
+		if (mProgressDialog != null) {
+			mProgressDialog.dismiss();
 		}
 	}
 	
-	public void checkNetworkConnection() {
+	public void dismissAlertDialog() {
+		if (mAlertDialog != null) {
+			mAlertDialog.dismiss();
+		}
+	}
+	
+	public void dismissDialogs() {
 		dismissProgressDialog();
+		dismissAlertDialog();
+	}
+	
+	public void checkNetworkConnection() {
+		dismissDialogs();
 		final BattleLaserGame game = this;
 		runOnUiThread(new Runnable() {
 			@Override
@@ -611,8 +698,9 @@ public class BattleLaserGame extends Activity
 					Toast.makeText(game, "An error occured while connecting", Toast.LENGTH_SHORT).show();
 				} else {
 					AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
-					builder.setTitle("Network Error").setMessage("Please make sure that you are connected to the internet.")
-						.setPositiveButton("OK", null).show();
+					mAlertDialog = builder.setTitle("Network Error").setMessage("Please make sure that you are connected to the internet.")
+						.setPositiveButton("OK", null).create();
+					mAlertDialog.show();
 				}
 			}
 		});

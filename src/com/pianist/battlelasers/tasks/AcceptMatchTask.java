@@ -9,6 +9,7 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.os.AsyncTask;
@@ -32,7 +33,7 @@ public class AcceptMatchTask extends AsyncTask<Void, Void, String>
         String responseString = "none";
         String uri = BattleLaserGame.BASE_URL + "/player/" + mPlayerId + "/accept";
         try {
-        	HttpDelete method = new HttpDelete(uri);
+        	HttpPut method = new HttpPut(uri);
         	
             response = httpclient.execute(method);
             StatusLine statusLine = response.getStatusLine();

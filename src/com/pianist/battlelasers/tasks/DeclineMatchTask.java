@@ -9,8 +9,10 @@ import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -32,7 +34,7 @@ public class DeclineMatchTask extends AsyncTask<Void, Void, String>
         String responseString = "none";
         String uri = BattleLaserGame.BASE_URL + "/player/" + mPlayerId + "/decline";
         try {
-        	HttpDelete method = new HttpDelete(uri);
+        	HttpPut method = new HttpPut(uri);
         	
             response = httpclient.execute(method);
             StatusLine statusLine = response.getStatusLine();
@@ -57,6 +59,9 @@ public class DeclineMatchTask extends AsyncTask<Void, Void, String>
 	@Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
+        SharedPreferences.Editor editor = BattleLaserGame.settings.edit();
+	    editor.putInt(BattleLaserGame.PREF_USER_ID, 0);
+	    editor.commit();
         Log.d("RESPONSE", result);
     }
 }

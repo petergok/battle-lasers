@@ -125,18 +125,18 @@ public class GameModeScreen extends Screen
 			{
 				match.onePlayer = true;
 				match.timerOn = true;
-				Screen screen = new GameSetupScreen(game, false, match);
+				Screen screen = new GameSetupScreen(game, true, match);
 				game.setScreen(screen);
 			}
 			else if (localMultButton.wasReleased())
 			{
 				match.onePlayer = false;
-				Screen screen = new GameSetupScreen(game, false, match);
+				Screen screen = new GameSetupScreen(game, true, match);
 				game.setScreen(screen);
 			} 
 			else if (onlineMultButton.wasReleased()) 
 			{
-				Screen screen = new MultiSetupScreen(game, false, match);
+				Screen screen = new MultiSetupScreen(game, true, match);
 				game.setScreen(screen);
 			}
 		}
