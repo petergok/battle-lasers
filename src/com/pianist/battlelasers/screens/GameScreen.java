@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.pianist.battlelasers.Assets;
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 import com.pianist.battlelasers.game_objects.AI;
 import com.pianist.battlelasers.game_objects.Button;
 import com.pianist.battlelasers.game_objects.LaserGun;
@@ -71,6 +71,8 @@ public class GameScreen extends Screen
 	private Button nextButton;
 
 	private Button mainButton;
+	
+	private Button mainButtonOnline;
 
 	// Time to store that are used for animation and turn length
 	private float timeSinceStart;
@@ -123,6 +125,8 @@ public class GameScreen extends Screen
 	private GameState state;
 	
 	private boolean loadedImages;
+	
+	private volatile boolean paused;
 
 	/**
 	 * The GameState describes all the states that the game could be in
@@ -145,7 +149,7 @@ public class GameScreen extends Screen
 	 *            one player or two player, how long a turn is and how many
 	 *            mirrors are involved
 	 */
-	public GameScreen(BattleLaserGame game, Match match)
+	public GameScreen(BattleLaserActivity game, Match match)
 	{
 		super(game, match);
 		
@@ -191,8 +195,13 @@ public class GameScreen extends Screen
 		// Create the menu and undo buttons at the top
 		undoButton = new Button(117, 17, Assets.undoButtonNor,
 				Assets.undoButtonClck);
-		menuButton = new Button(257, 17, Assets.gameMenuButtonNor,
-				Assets.gameMenuButtonClck);
+		if (match.isOnline) {
+			menuButton = new Button(197, 17, Assets.gameMenuButtonNor,
+					Assets.gameMenuButtonClck);
+		} else {
+			menuButton = new Button(257, 17, Assets.gameMenuButtonNor,
+					Assets.gameMenuButtonClck);
+		}
 
 		// Initialize other important variables to default
 		if (match.isOnline && match.playerNumberForOnline == 2) {
@@ -217,6 +226,8 @@ public class GameScreen extends Screen
 		showMenu = false;
 		letRelease = false;
 		freezeTime = false;
+		
+		paused = false;
 	}
 
 	/**
@@ -347,16 +358,22 @@ public class GameScreen extends Screen
 			if (showMenu)
 			{
 				mainButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
-				if (mainButton.wasReleased())
+				if (mainButtonOnline != null) {
+					mainButtonOnline.click(nextEvent.x, nextEvent.y, nextEvent.type);
+				}
+				if (((mainButtonOnline == null || state == GameState.WinningAnimation) && mainButton.wasReleased()) 
+						|| (mainButtonOnline != null && state != GameState.WinningAnimation && mainButtonOnline.wasReleased()))
 				{
 					if (match.isOnline) 
 					{
+						if (match.matchStarted) {
+							match.loseOnlineGame();
+						}
 						new UnregisterPlayerTask(match.onlineUserId).execute();
 						match.showDialogs = false;
 					}
 					Screen nextScreen = new MainMenuScreen(game, true, match);
 					game.setScreen(nextScreen);
-					disposeAnimationImages();
 				}
 
 				// Based on if the game is over and how games were played, show
@@ -371,7 +388,7 @@ public class GameScreen extends Screen
 					{
 						showMenu = false;
 					}
-					else if (restartButton.wasReleased())
+					else if (!match.isOnline && restartButton.wasReleased())
 					{
 						Screen newScreen = new GameScreen(game, match);
 						game.setScreen(newScreen);
@@ -431,7 +448,7 @@ public class GameScreen extends Screen
 					showMenu = true;
 					return;
 				}
-				else if (undoButton.wasReleased()
+				else if (!match.isOnline && undoButton.wasReleased()
 						&& state != GameState.WinningAnimation)
 				{
 					undoMove();
@@ -2228,7 +2245,7 @@ public class GameScreen extends Screen
 	 * Recycles all the animation images that were used in the beginning of the
 	 * game
 	 */
-	private void disposeAnimationImages()
+	private synchronized void disposeAnimationImages()
 	{
 		for (int index = 0; index < 5; index++)
 		{
@@ -2247,7 +2264,7 @@ public class GameScreen extends Screen
 	 * @param g
 	 *            The graphics from which to load the images
 	 */
-	private void loadPlayImages(Graphics g)
+	private synchronized void loadPlayImages(Graphics g)
 	{
 		Assets.laserBounBottom = g.newPixmap("LaserBounceBottom.png",
 				PixmapFormat.ARGB4444);
@@ -2332,18 +2349,25 @@ public class GameScreen extends Screen
 				PixmapFormat.ARGB4444);
 
 		// Create all the buttons in the game
-		resumeButton = new Button(170, 350, Assets.resumeButtonNor,
-				Assets.resumeButtonClck);
 		closeButton = new Button(170, 350, Assets.closeButtonNor,
 				Assets.closeButtonClck);
+		if (match.isOnline) {
+			resumeButton = new Button(170, 380, Assets.resumeButtonNor,
+					Assets.resumeButtonClck);
+			mainButtonOnline = new Button(170, 450, Assets.mainButtonNor,
+					Assets.mainButtonClck);
+		} else {
+			resumeButton = new Button(170, 350, Assets.resumeButtonNor,
+					Assets.resumeButtonClck);
+		}
+		mainButton = new Button(170, 480, Assets.mainButtonNor,
+				Assets.mainButtonClck);
 		restartButton = new Button(170, 415, Assets.restartButtonNor,
 				Assets.restartButtonClck);
 		nextButton = new Button(170, 415, Assets.menuNextButtonNor,
 				Assets.menuNextButtonClck);
 		newButton = new Button(170, 415, Assets.menuNewButtonNor,
 				Assets.menuNewButtonClck);
-		mainButton = new Button(170, 480, Assets.mainButtonNor,
-				Assets.mainButtonClck);
 	}
 
 	/**
@@ -2459,7 +2483,11 @@ public class GameScreen extends Screen
 		}
 
 		// Draw the gun, border, and title
-		playerOne.drawHighlight(g, true);
+		if (match.isOnline && !playerOneTurn) {
+			playerTwo.drawHighlight(g, true);
+		} else {
+			playerOne.drawHighlight(g, true);
+		}
 
 		playerTwo.draw(g, false);
 		playerOne.draw(g, true);
@@ -2470,7 +2498,9 @@ public class GameScreen extends Screen
 
 		// Draw the buttons, target, and timer bar
 		menuButton.draw(g);
-		undoButton.draw(g);
+		if (!match.isOnline) {
+			undoButton.draw(g);
+		}
 
 		g.drawPixmap(Assets.target, 243 - Assets.target.getWidth() / 2,
 				438 - Assets.target.getHeight() / 2);
@@ -2494,6 +2524,10 @@ public class GameScreen extends Screen
 	 */
 	private void presentGameScreen()
 	{
+		if (paused) {
+			return;
+		}
+		
 		Graphics g = game.getGraphics();
 
 		// Draw the background and shaded tiles
@@ -2627,7 +2661,9 @@ public class GameScreen extends Screen
 
 		// Draw the buttons
 		menuButton.draw(g);
-		undoButton.draw(g);
+		if (!match.isOnline) {
+			undoButton.draw(g);
+		}
 
 		// Draw the timer bar based on whose turn it is
 		if (match.timerOn)
@@ -2751,13 +2787,21 @@ public class GameScreen extends Screen
 				newButton.draw(g);
 			else
 				nextButton.draw(g);
+			mainButton.draw(g);
+			return;
 		}
 		else
 		{
 			resumeButton.draw(g);
-			restartButton.draw(g);
+			if (!match.isOnline) {
+				restartButton.draw(g);
+			}
 		}
-		mainButton.draw(g);
+		if (match.isOnline) {
+			mainButtonOnline.draw(g);
+		} else {
+			mainButton.draw(g);
+		}
 	}
 
 	/**
@@ -2767,8 +2811,12 @@ public class GameScreen extends Screen
 	 * @param deltaTime
 	 *            The amount of time since the last frame was drawn
 	 */
-	public void present(float deltaTime)
+	public synchronized void present(float deltaTime)
 	{
+		if (paused) {
+			return;
+		}
+		
 		// Draw the game screen based on what the game state is
 		if (state == GameState.Animate)
 		{
@@ -2829,23 +2877,27 @@ public class GameScreen extends Screen
 	/**
 	 * Called when the game is paused
 	 */
-	public void pause()
+	public synchronized void pause()
 	{
+		paused = true;
 	}
 
 	/**
 	 * Called when the game is resumed
 	 */
-	public void resume()
+	public synchronized void resume()
 	{
+		paused = false;
 	}
 
 	/**
 	 * Called when the screen is being closed or switched. This method recycles
 	 * all the images it doesn't need anymore
 	 */
-	public void dispose()
+	public synchronized void dispose()
 	{
+		disposeAnimationImages();
+		
 		game.disposeImage(Assets.laserBounBottom);
 		game.disposeImage(Assets.laserBounLeft);
 		game.disposeImage(Assets.laserBounRight);
@@ -2874,7 +2926,7 @@ public class GameScreen extends Screen
 		Assets.winningAnimation = null;
 	}
 	
-	public void startOnlineMatch() {
+	public synchronized void startOnlineMatch() {
 		state = GameState.Running;
 		match.matchStarted = true;
 	}

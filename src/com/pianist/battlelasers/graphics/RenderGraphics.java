@@ -1,6 +1,6 @@
 package com.pianist.battlelasers.graphics;
 
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -17,7 +17,7 @@ import android.view.SurfaceView;
  * @version May 26, 2013
  */
 public class RenderGraphics extends SurfaceView implements Runnable {
-	BattleLaserGame game;
+	BattleLaserActivity game;
 	SurfaceHolder surface;
 	Bitmap frameBuffer;
 	Thread graphicsThread = null;
@@ -32,7 +32,7 @@ public class RenderGraphics extends SurfaceView implements Runnable {
 	 * @param frameBuffer
 	 *            The framebuffer that the game will be drawing to
 	 */
-	public RenderGraphics(Bitmap frameBuffer, BattleLaserGame game) {
+	public RenderGraphics(Bitmap frameBuffer, BattleLaserActivity game) {
 		super(game);
 		this.game = game;
 		this.frameBuffer = frameBuffer;

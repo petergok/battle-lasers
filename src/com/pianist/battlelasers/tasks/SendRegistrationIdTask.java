@@ -19,18 +19,18 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
 public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
 {
-	private BattleLaserGame mActivity;
+	private BattleLaserActivity mActivity;
 	private String mRegId;
 	private int mRating;
 	
-	public SendRegistrationIdTask(BattleLaserGame activity, String regId, int rating) {
+	public SendRegistrationIdTask(BattleLaserActivity activity, String regId, int rating) {
 		mRegId = regId;
 		mRating = rating;
 		mActivity = activity;
@@ -42,7 +42,7 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
 		HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = "none";
-        String uri = BattleLaserGame.BASE_URL + "/player";
+        String uri = BattleLaserActivity.BASE_URL + "/player";
         try {
         	HttpPut method = new HttpPut(uri);
         	

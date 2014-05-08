@@ -6,7 +6,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 
 import com.pianist.battlelasers.Assets;
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 import com.pianist.battlelasers.game_objects.Button;
 import com.pianist.battlelasers.game_objects.Match;
 import com.pianist.battlelasers.graphics.Graphics;
@@ -53,7 +53,7 @@ public class MainMenuScreen extends Screen
 	 * @param match
 	 *            The match option for the past or future game
 	 */
-	public MainMenuScreen(BattleLaserGame game, boolean loadImages, Match match)
+	public MainMenuScreen(BattleLaserActivity game, boolean loadImages, Match match)
 	{
 		super(game, match);
 		loaded = false;

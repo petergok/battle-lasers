@@ -15,7 +15,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 
 public class AcceptMatchTask extends AsyncTask<Void, Void, String>
 {
@@ -31,7 +31,7 @@ public class AcceptMatchTask extends AsyncTask<Void, Void, String>
 		HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = "none";
-        String uri = BattleLaserGame.BASE_URL + "/player/" + mPlayerId + "/accept";
+        String uri = BattleLaserActivity.BASE_URL + "/player/" + mPlayerId + "/accept";
         try {
         	HttpPut method = new HttpPut(uri);
         	

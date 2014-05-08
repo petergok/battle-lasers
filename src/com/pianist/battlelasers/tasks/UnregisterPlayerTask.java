@@ -11,7 +11,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -31,7 +31,7 @@ public class UnregisterPlayerTask extends AsyncTask<Void, Void, String>
 		HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = "none";
-        String uri = BattleLaserGame.BASE_URL + "/player/" + mPlayerId;
+        String uri = BattleLaserActivity.BASE_URL + "/player/" + mPlayerId;
         try {
         	HttpDelete method = new HttpDelete(uri);
         	
@@ -58,8 +58,8 @@ public class UnregisterPlayerTask extends AsyncTask<Void, Void, String>
 	@Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        SharedPreferences.Editor editor = BattleLaserGame.settings.edit();
-	    editor.putInt(BattleLaserGame.PREF_USER_ID, 0);
+        SharedPreferences.Editor editor = BattleLaserActivity.settings.edit();
+	    editor.putInt(BattleLaserActivity.PREF_USER_ID, 0);
 	    editor.commit();
         Log.d("RESPONSE", result);
     }

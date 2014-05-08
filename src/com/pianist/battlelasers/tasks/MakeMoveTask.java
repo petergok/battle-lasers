@@ -16,7 +16,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 
 import android.graphics.Point;
 import android.os.AsyncTask;
@@ -42,7 +42,7 @@ public class MakeMoveTask extends AsyncTask<Void, Void, String>
 		HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = "none";
-        String uri = BattleLaserGame.BASE_URL + "/player/" + mPlayerId + "/move";
+        String uri = BattleLaserActivity.BASE_URL + "/player/" + mPlayerId + "/move";
         try {
         	HttpPut method = new HttpPut(uri);
         	

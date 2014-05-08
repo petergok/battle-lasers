@@ -16,7 +16,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 
 public class DeclineMatchTask extends AsyncTask<Void, Void, String>
 {
@@ -32,7 +32,7 @@ public class DeclineMatchTask extends AsyncTask<Void, Void, String>
 		HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response;
         String responseString = "none";
-        String uri = BattleLaserGame.BASE_URL + "/player/" + mPlayerId + "/decline";
+        String uri = BattleLaserActivity.BASE_URL + "/player/" + mPlayerId + "/decline";
         try {
         	HttpPut method = new HttpPut(uri);
         	
@@ -59,8 +59,8 @@ public class DeclineMatchTask extends AsyncTask<Void, Void, String>
 	@Override
     protected void onPostExecute(String result) {
         super.onPostExecute(result);
-        SharedPreferences.Editor editor = BattleLaserGame.settings.edit();
-	    editor.putInt(BattleLaserGame.PREF_USER_ID, 0);
+        SharedPreferences.Editor editor = BattleLaserActivity.settings.edit();
+	    editor.putInt(BattleLaserActivity.PREF_USER_ID, 0);
 	    editor.commit();
         Log.d("RESPONSE", result);
     }

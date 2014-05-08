@@ -1,6 +1,6 @@
 package com.pianist.battlelasers.screens;
 
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 import com.pianist.battlelasers.game_objects.Match;
 
 /**
@@ -12,7 +12,7 @@ import com.pianist.battlelasers.game_objects.Match;
 public abstract class Screen {
 	
 	// Store the game object to use for drawing, input management and other access to features
-    protected final BattleLaserGame game;
+    protected final BattleLaserActivity game;
     protected Match mMatch;
 
     /**
@@ -21,7 +21,7 @@ public abstract class Screen {
      * @param game
      * 		The BattleLaserGame that created this screen
      */
-    public Screen(BattleLaserGame game, Match match) {
+    public Screen(BattleLaserActivity game, Match match) {
         this.game = game;
         mMatch = match;
     }

@@ -56,7 +56,7 @@ import android.widget.Toast;
  * @author Alex Szoke & Peter Gokhshteyn
  * @version Date: June 16, 2013
  */
-public class BattleLaserGame extends Activity
+public class BattleLaserActivity extends Activity
 {
 	private static String TAG = "BattleLaserGame";
 	
@@ -128,6 +128,7 @@ public class BattleLaserGame extends Activity
 	    @Override
 	    public void onReceive(Context context, Intent intent) {
 	        if(intent.getAction().equals(MATCH_FOUND)) {
+	        	mMatch.showDialogs = true;
 	        	String otherPlayerName = intent.getStringExtra("otherPlayerName");
 	        	int playerNumber = intent.getIntExtra("playerNumber", 0);
 	        	int otherPlayerRating = intent.getIntExtra("otherPlayerRating", 1000);
@@ -154,8 +155,8 @@ public class BattleLaserGame extends Activity
 	        	} else if (mMatch.matchStarted) {
 	        		showUserForfeitDialog();
 	        	}
-	        	SharedPreferences.Editor editor = BattleLaserGame.settings.edit();
-	    	    editor.putInt(BattleLaserGame.PREF_USER_ID, 0);
+	        	SharedPreferences.Editor editor = BattleLaserActivity.settings.edit();
+	    	    editor.putInt(BattleLaserActivity.PREF_USER_ID, 0);
 	    	    editor.commit();
 	        } else if (intent.getAction().equals(MATCH_START)) {
 	        	if (screen instanceof GameScreen) {
@@ -286,7 +287,7 @@ public class BattleLaserGame extends Activity
 	private SharedPreferences getGCMPreferences(Context context) {
 	    // This sample app persists the registration ID in shared preferences, but
 	    // how you store the regID in your app is up to you.
-	    return getSharedPreferences(BattleLaserGame.class.getSimpleName(),
+	    return getSharedPreferences(BattleLaserActivity.class.getSimpleName(),
 	            Context.MODE_PRIVATE);
 	}
 	
@@ -509,7 +510,6 @@ public class BattleLaserGame extends Activity
 	}
 	
 	public void registeredUser(int userId) {
-		mMatch.showDialogs = true;
 		SharedPreferences.Editor editor = settings.edit();
 	    editor.putInt(PREF_USER_ID, userId);
 	    editor.commit();
@@ -525,7 +525,7 @@ public class BattleLaserGame extends Activity
 			return;
 		}
 		
-		final BattleLaserGame game = this;
+		final BattleLaserActivity game = this;
 		dismissDialogs();
 		runOnUiThread(new Runnable() {
 			@Override
@@ -568,14 +568,14 @@ public class BattleLaserGame extends Activity
 			return;
 		}
 		
-		final BattleLaserGame game = this;
+		final BattleLaserActivity game = this;
 		dismissDialogs();
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run()
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
-				mAlertDialog = builder.setTitle("Match found")
+				mAlertDialog = builder.setTitle("Match Found")
 					.setCancelable(false)
 					.setMessage("Other player declined the match.")
 					.setPositiveButton("OK", new OnClickListener() {
@@ -601,14 +601,14 @@ public class BattleLaserGame extends Activity
 			return;
 		}
 		
-		final BattleLaserGame game = this;
+		final BattleLaserActivity game = this;
 		dismissDialogs();
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run()
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
-				mAlertDialog = builder.setTitle("Match found")
+				mAlertDialog = builder.setTitle("Game Over")
 					.setCancelable(false)
 					.setMessage("Other player forfeit, you win!")
 					.setPositiveButton("OK", new OnClickListener() {
@@ -631,7 +631,7 @@ public class BattleLaserGame extends Activity
 	}
 	
 	public void showProgressDialog(final String text, final boolean canceleable) {
-		final BattleLaserGame game = this;
+		final BattleLaserActivity game = this;
 		dismissAlertDialog();
 		runOnUiThread(new Runnable() {
 			@Override
@@ -690,7 +690,7 @@ public class BattleLaserGame extends Activity
 	
 	public void checkNetworkConnection() {
 		dismissDialogs();
-		final BattleLaserGame game = this;
+		final BattleLaserActivity game = this;
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {

@@ -5,7 +5,7 @@ import java.util.List;
 import android.graphics.Color;
 
 import com.pianist.battlelasers.Assets;
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 import com.pianist.battlelasers.game_objects.Button;
 import com.pianist.battlelasers.game_objects.Match;
 import com.pianist.battlelasers.graphics.Graphics;
@@ -51,7 +51,7 @@ public class InstructionsScreen extends Screen
 	 * @param loadImages
 	 *            A boolean of whether or not to load the images
 	 */
-	public InstructionsScreen(BattleLaserGame game, int number, Match match, boolean isGuide)
+	public InstructionsScreen(BattleLaserActivity game, int number, Match match, boolean isGuide)
 	{
 		super(game, match);
 		this.number = number;

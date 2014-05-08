@@ -3,7 +3,7 @@ package com.pianist.battlelasers.screens;
 import java.util.List;
 
 import com.pianist.battlelasers.Assets;
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 import com.pianist.battlelasers.game_objects.Button;
 import com.pianist.battlelasers.game_objects.Match;
 import com.pianist.battlelasers.graphics.Graphics;
@@ -27,7 +27,9 @@ public class MultiSetupScreen extends Screen
 	
 	private boolean loaded;
 	
-	public MultiSetupScreen(BattleLaserGame game, boolean loadImages, Match match) {
+	private boolean paused;
+	
+	public MultiSetupScreen(BattleLaserActivity game, boolean loadImages, Match match) {
 		super(game, match);
 		
 		match.resetOnline();
@@ -37,14 +39,16 @@ public class MultiSetupScreen extends Screen
 		startingGame = false;
 		
 		loaded = false;
+		
+		paused = false;
 	}
 	
-	public void registeredUser(int id) {
+	public synchronized void registeredUser(int id) {
 		game.showProgressDialog("Looking for a match...", true);
 		match.onlineUserId = id;
 	}
 	
-	public void createdMatch(String otherPlayerName, int mapId, int playerNumber, int otherPlayerRating) {
+	public synchronized void createdMatch(String otherPlayerName, int mapId, int playerNumber, int otherPlayerRating) {
 		game.dismissProgressDialog();
 		game.showNewMatchDialog(otherPlayerName, otherPlayerRating);
 		match.playerNumberForOnline = playerNumber;
@@ -53,14 +57,14 @@ public class MultiSetupScreen extends Screen
 		match.currentLayout = match.getLayout(mapId);
 	}
 	
-	public void startMatch() {
+	public synchronized void startMatch() {
 		startingGame = true;
 		Screen screen = new GameScreen(game, match);
 		game.setScreen(screen);
 	}
 
 	@Override
-	public void update(float deltaTime)
+	public synchronized void update(float deltaTime)
 	{
 		Graphics g = game.getGraphics();
 
@@ -285,7 +289,7 @@ public class MultiSetupScreen extends Screen
 			}
 			else if (matchSearchButton.wasReleased()) 
 			{
-				match.onlineUserId = BattleLaserGame.settings.getInt(BattleLaserGame.PREF_USER_ID, 0);
+				match.onlineUserId = BattleLaserActivity.settings.getInt(BattleLaserActivity.PREF_USER_ID, 0);
 				game.showProgressDialog("Connecting to server...", true);
 				game.registerGCM();
 			}
@@ -293,9 +297,9 @@ public class MultiSetupScreen extends Screen
 	}
 
 	@Override
-	public void present(float deltaTime)
+	public synchronized void present(float deltaTime)
 	{
-		if (!startingGame) {
+		if (!startingGame && !paused) {
 			try {
 				Graphics g = game.getGraphics();
 		
@@ -313,17 +317,19 @@ public class MultiSetupScreen extends Screen
 	}
 
 	@Override
-	public void pause()
+	public synchronized void pause()
 	{
+		paused = true;
 	}
 
 	@Override
-	public void resume()
+	public synchronized void resume()
 	{
+		paused = false;
 	}
 
 	@Override
-	public void dispose()
+	public synchronized void dispose()
 	{
 		if (startingGame)
 		{

@@ -3,7 +3,7 @@ package com.pianist.battlelasers.screens;
 import java.util.List;
 
 import com.pianist.battlelasers.Assets;
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 import com.pianist.battlelasers.game_objects.Button;
 import com.pianist.battlelasers.game_objects.Match;
 import com.pianist.battlelasers.game_objects.AI.AIDifficulty;
@@ -53,7 +53,7 @@ public class GameSetupScreen extends Screen
 	 *            A default match object to assign the parameters of the current
 	 *            match in the game to
 	 */
-	public GameSetupScreen(BattleLaserGame game, boolean loadImages, Match match)
+	public GameSetupScreen(BattleLaserActivity game, boolean loadImages, Match match)
 	{
 		super(game, match);
 

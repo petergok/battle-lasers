@@ -227,10 +227,12 @@ public class Match
 	}
 	
 	public void loseOnlineGame() {
+		matchStarted = false;
 		onlineRating -= 100;
 	}
 	
 	public void winOnlineGame() {
+		matchStarted = false;
 		onlineRating += 100;
 	}
 

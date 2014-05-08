@@ -3,7 +3,7 @@ package com.pianist.battlelasers.screens;
 import java.util.List;
 
 import com.pianist.battlelasers.Assets;
-import com.pianist.battlelasers.activities.BattleLaserGame;
+import com.pianist.battlelasers.activities.BattleLaserActivity;
 import com.pianist.battlelasers.game_objects.Button;
 import com.pianist.battlelasers.game_objects.Match;
 import com.pianist.battlelasers.game_objects.AI.AIDifficulty;
@@ -52,7 +52,7 @@ public class GameModeScreen extends Screen
 	 *            A default match object to assign the parameters of the current
 	 *            match in the game to
 	 */
-	public GameModeScreen(BattleLaserGame game, Match match)
+	public GameModeScreen(BattleLaserActivity game, Match match)
 	{
 		super(game, match);
 
@@ -125,18 +125,18 @@ public class GameModeScreen extends Screen
 			{
 				match.onePlayer = true;
 				match.timerOn = true;
-				Screen screen = new GameSetupScreen(game, true, match);
+				Screen screen = new GameSetupScreen(game, false, match);
 				game.setScreen(screen);
 			}
 			else if (localMultButton.wasReleased())
 			{
 				match.onePlayer = false;
-				Screen screen = new GameSetupScreen(game, true, match);
+				Screen screen = new GameSetupScreen(game, false, match);
 				game.setScreen(screen);
 			} 
 			else if (onlineMultButton.wasReleased()) 
 			{
-				Screen screen = new MultiSetupScreen(game, true, match);
+				Screen screen = new MultiSetupScreen(game, false, match);
 				game.setScreen(screen);
 			}
 		}
