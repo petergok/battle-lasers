@@ -64,7 +64,7 @@ public class Button
 	 *            The type of event occurring to the button
 	 */
 	public void click(int x, int y, int type)
-	{
+	{	
 		// Handles if the button was released
 		if (type == TouchEvent.TOUCH_UP)
 		{

@@ -202,10 +202,6 @@ public class MultiSetupScreen extends Screen
 				Assets.background = g.newPixmap("Background.png",
 						PixmapFormat.ARGB4444);
 				
-				Assets.puzzleButtonNor = g.newPixmap("PuzzleButtonNormal.png",
-						PixmapFormat.ARGB4444);
-				Assets.puzzleButtonClck = g.newPixmap("PuzzleButtonClicked.png",
-						PixmapFormat.ARGB4444);
 				Assets.singleButtonNor = g.newPixmap("SingleButtonNormal.png",
 						PixmapFormat.ARGB4444);
 				Assets.singleButtonClck = g.newPixmap("SingleButtonClicked.png",
@@ -374,8 +370,6 @@ public class MultiSetupScreen extends Screen
 			
 			game.disposeImage(Assets.singleButtonNor);
 			game.disposeImage(Assets.singleButtonClck);
-			game.disposeImage(Assets.puzzleButtonNor);
-			game.disposeImage(Assets.puzzleButtonClck);
 			game.disposeImage(Assets.localMultButtonNor);
 			game.disposeImage(Assets.localMultButtonClck);
 			game.disposeImage(Assets.onlineMultButtonNor);

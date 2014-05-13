@@ -90,10 +90,6 @@ public class MainMenuScreen extends Screen
 						PixmapFormat.ARGB4444);
 				Assets.undoButtonClck = g.newPixmap("UndoButtonClicked.png",
 						PixmapFormat.ARGB4444);
-				Assets.puzzleButtonNor = g.newPixmap("PuzzleButtonNormal.png",
-						PixmapFormat.ARGB4444);
-				Assets.puzzleButtonClck = g.newPixmap("PuzzleButtonClicked.png",
-						PixmapFormat.ARGB4444);
 				Assets.singleButtonNor = g.newPixmap("SingleButtonNormal.png",
 						PixmapFormat.ARGB4444);
 				Assets.singleButtonClck = g.newPixmap("SingleButtonClicked.png",

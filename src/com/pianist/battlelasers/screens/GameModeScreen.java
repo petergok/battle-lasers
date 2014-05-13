@@ -30,8 +30,6 @@ public class GameModeScreen extends Screen
 	// Store the buttons
 	Button leftButton;
 	
-	Button puzzleButton;
-	
 	Button singleButton;
 	
 	Button localMultButton;
@@ -80,13 +78,11 @@ public class GameModeScreen extends Screen
 			// Load all the buttons
 			leftButton = new Button(28, 727, Assets.leftButtonNor,
 					Assets.leftButtonClck);
-			puzzleButton = new Button(220, 187, Assets.puzzleButtonNor,
-					Assets.puzzleButtonClck);
-			singleButton = new Button(50, 327, Assets.singleButtonNor,
+			singleButton = new Button(50, 207, Assets.singleButtonNor,
 					Assets.singleButtonClck);
-			localMultButton = new Button(160, 467, Assets.localMultButtonNor,
+			localMultButton = new Button(160, 382, Assets.localMultButtonNor,
 					Assets.localMultButtonClck);
-			onlineMultButton = new Button(70, 607, Assets.onlineMultButtonNor,
+			onlineMultButton = new Button(70, 557, Assets.onlineMultButtonNor,
 					Assets.onlineMultButtonClck);
 		}
 		// If the graphics have been loaded
@@ -110,7 +106,6 @@ public class GameModeScreen extends Screen
 				
 				// Update the buttons
 				leftButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
-				puzzleButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
 				singleButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
 				localMultButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
 				onlineMultButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
@@ -158,7 +153,6 @@ public class GameModeScreen extends Screen
 
 		// Draw all the buttons
 		leftButton.draw(g);
-		puzzleButton.draw(g);
 		singleButton.draw(g);
 		localMultButton.draw(g);
 		onlineMultButton.draw(g);

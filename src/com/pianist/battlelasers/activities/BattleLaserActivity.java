@@ -2,6 +2,9 @@ package com.pianist.battlelasers.activities;
 
 import java.io.IOException;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -124,6 +127,12 @@ public class BattleLaserActivity extends Activity
 	
 	public static int screenHeight;
 	
+	private String MY_AD_UNIT_ID = "ca-app-pub-6108834597007793/9286444460";
+	
+	private InterstitialAd interstitial;
+	
+	public boolean showingAd = false;
+	
 	private BroadcastReceiver bReceiver = new BroadcastReceiver() {
 	    @Override
 	    public void onReceive(Context context, Intent intent) {
@@ -153,14 +162,14 @@ public class BattleLaserActivity extends Activity
 	        	if (!mMatch.matchStarted && !mMatch.endMatch && (screen instanceof MultiSetupScreen || screen instanceof GameScreen)) {
 	        		showUserDeclinedDialog();
 	        	} else if (mMatch.matchStarted) {
-	        		showUserForfeitDialog();
+	        		showUserForfeitDialog(false);
 	        	}
 	        	SharedPreferences.Editor editor = BattleLaserActivity.settings.edit();
 	    	    editor.putInt(BattleLaserActivity.PREF_USER_ID, 0);
 	    	    editor.commit();
 	        } else if (intent.getAction().equals(MATCH_START)) {
 	        	if (screen instanceof GameScreen) {
-	        		dismissProgressDialog();
+	        		dismissDialogs();
 	        		((GameScreen) screen).startOnlineMatch();
 	        	}
 	        }
@@ -215,6 +224,16 @@ public class BattleLaserActivity extends Activity
 	    isGuideCompleted = settings.getBoolean(PREF_GUIDE_COMPLETED, false);
 		screen = new MainMenuScreen(this, true, mMatch);
 		setContentView(renderView);
+		
+		// Create the interstitial.
+	    interstitial = new InterstitialAd(this);
+	    interstitial.setAdUnitId(MY_AD_UNIT_ID);
+
+	    // Create ad request.
+	    AdRequest adRequest = new AdRequest.Builder().build();
+
+	    // Begin loading your interstitial.
+	    interstitial.loadAd(adRequest);
 		
 		mContext = getApplicationContext();
 		
@@ -392,12 +411,15 @@ public class BattleLaserActivity extends Activity
 	@Override
 	public void onStop() {
 		if (mMatch != null && mMatch.onlineUserId != 0 && mMatch.matchStarted) {
-			loseOnlineGame();
-			new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+			if (!showingAd) {
+				loseOnlineGame();
+				new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+			}
 		} else if (mMatch != null && mMatch.isOnline) {
-			new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+			if (!showingAd) {
+				new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+			}
 		}
-		mMatch.showDialogs = false;
 		super.onStop();
 	}
 	
@@ -536,7 +558,7 @@ public class BattleLaserActivity extends Activity
 				if (displayName.length() >= 30) {
 					displayName = displayName.substring(0, 30) + "...";
 				}
-				mAlertDialog = builder.setTitle("Match found")
+				mAlertDialog = builder.setTitle("Match Found")
 					.setCancelable(false)
 					.setMessage("Player Name: " + displayName + "\n\n" + "Rating: " + otherPlayerRating)
 					.setPositiveButton("Accept", new OnClickListener() {
@@ -575,7 +597,7 @@ public class BattleLaserActivity extends Activity
 			public void run()
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
-				mAlertDialog = builder.setTitle("Match Found")
+				mAlertDialog = builder.setTitle("Match Declined")
 					.setCancelable(false)
 					.setMessage("Other player declined the match.")
 					.setPositiveButton("OK", new OnClickListener() {
@@ -596,7 +618,7 @@ public class BattleLaserActivity extends Activity
 		});
 	}
 	
-	public void showUserForfeitDialog() {
+	public void showUserForfeitDialog(final boolean disconnected) {
 		if (!mMatch.showDialogs) {
 			return;
 		}
@@ -610,7 +632,7 @@ public class BattleLaserActivity extends Activity
 				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
 				mAlertDialog = builder.setTitle("Game Over")
 					.setCancelable(false)
-					.setMessage("Other player forfeit, you win!")
+					.setMessage(disconnected ? "Other player disconnected, you win!" : "Other player forfeit, you win!")
 					.setPositiveButton("OK", new OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which)
@@ -620,11 +642,38 @@ public class BattleLaserActivity extends Activity
 										mMatch);
 								game.setScreen(nextScreen);
 								winOnlineGame();
+							} else {
+								registerGCM();
+								game.showProgressDialog("Connecting to server...", true);
 							}
-							registerGCM();
-							game.showProgressDialog("Connecting to server...", true);
 						}
 					}).create();
+				mAlertDialog.show();
+			}
+		});
+	}
+	
+	public void showConfirmExitDialog() {
+		final BattleLaserActivity game = this;
+		dismissDialogs();
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run()
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
+				mAlertDialog = builder.setTitle("Warning")
+					.setCancelable(false)
+					.setMessage("Are you sure you want to exit? You will forfeit the match.")
+					.setPositiveButton("Yes", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which)
+						{
+							if (screen instanceof GameScreen) {
+								((GameScreen) screen).exitGame();
+							}
+						}
+					})
+					.setNegativeButton("No", null).create();
 				mAlertDialog.show();
 			}
 		});
@@ -711,5 +760,41 @@ public class BattleLaserActivity extends Activity
 	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+	}
+	
+	public boolean isDialogShowing() {
+		return (mAlertDialog != null && mAlertDialog.isShowing()) || mProgressDialog != null && mProgressDialog.isShowing();
+	}
+	
+	public void displayInterstitial() {
+		final BattleLaserActivity activity = this;
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run()
+			{
+				if (interstitial.isLoaded()) {
+					showingAd = true;
+			    	interstitial.show();
+			    	
+			    	// Create the interstitial.
+				    interstitial = new InterstitialAd(activity);
+				    interstitial.setAdUnitId(MY_AD_UNIT_ID);
+					
+					// Create ad request.
+				    AdRequest adRequest = new AdRequest.Builder().build();
+
+				    // Begin loading your interstitial.
+				    interstitial.loadAd(adRequest);
+				    
+				    interstitial.setAdListener(new AdListener() {
+				    	@Override
+				    	public void onAdClosed() {
+				    		showingAd = false;
+				    	}
+				    });
+			    }
+			}
+		});
 	}
 }

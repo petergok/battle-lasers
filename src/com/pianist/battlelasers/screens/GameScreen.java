@@ -16,13 +16,11 @@ import com.pianist.battlelasers.game_objects.Match.Layout;
 import com.pianist.battlelasers.graphics.Graphics;
 import com.pianist.battlelasers.graphics.Pixmap;
 import com.pianist.battlelasers.graphics.Graphics.PixmapFormat;
-import com.pianist.battlelasers.input_handlers.Input;
 import com.pianist.battlelasers.input_handlers.Input.KeyEvent;
 import com.pianist.battlelasers.input_handlers.Input.TouchEvent;
 import com.pianist.battlelasers.tasks.MakeMoveTask;
 import com.pianist.battlelasers.tasks.UnregisterPlayerTask;
 
-import android.graphics.Color;
 import android.graphics.Point;
 
 /**
@@ -127,6 +125,14 @@ public class GameScreen extends Screen
 	private boolean loadedImages;
 	
 	private volatile boolean paused;
+	
+	private volatile boolean mWaitingForPlayer;
+	
+	private boolean mDeclinedDialogShown;
+	
+	private boolean mForfeitDialogShown;
+	
+	private boolean mDisplayed;
 
 	/**
 	 * The GameState describes all the states that the game could be in
@@ -154,6 +160,11 @@ public class GameScreen extends Screen
 		super(game, match);
 		
 		loadedImages = false;
+		mWaitingForPlayer = false;
+		mDeclinedDialogShown = false;
+		mForfeitDialogShown = false;
+		
+		mDisplayed = false;
 
 		this.match = match;
 		grid = new Mirror[12][8];
@@ -243,9 +254,19 @@ public class GameScreen extends Screen
 		timeSinceStart += deltaTime;
 		laserStartTime += deltaTime;
 		if (!match.timerOn || freezeTime || state == GameState.TapToStart
-				|| shootLaser || (showMenu && !match.isOnline))
+				|| shootLaser || (showMenu && !match.isOnline) || game.isDialogShowing() || game.showingAd)
 		{
 			turnStart += deltaTime;
+		}
+		
+		if (mWaitingForPlayer && !mDeclinedDialogShown && timeSinceStart >= 10) {
+			mDeclinedDialogShown = true;
+			new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+			game.showUserDeclinedDialog();
+		} else if (mMatch.isOnline && !mForfeitDialogShown && timeSinceStart - turnStart >= turnLength + 10) {
+			mForfeitDialogShown = true;
+			new UnregisterPlayerTask(mMatch.onlineUserId).execute();
+			game.showUserForfeitDialog(true);
 		}
 
 		// Check for key events (in particular the back key)
@@ -364,16 +385,13 @@ public class GameScreen extends Screen
 				if (((mainButtonOnline == null || state == GameState.WinningAnimation) && mainButton.wasReleased()) 
 						|| (mainButtonOnline != null && state != GameState.WinningAnimation && mainButtonOnline.wasReleased()))
 				{
-					if (match.isOnline) 
-					{
-						if (match.matchStarted) {
-							match.loseOnlineGame();
-						}
-						new UnregisterPlayerTask(match.onlineUserId).execute();
-						match.showDialogs = false;
+					if (!match.isOnline || !match.matchStarted) {
+						Screen nextScreen = new MainMenuScreen(game, true, match);
+						game.setScreen(nextScreen);
+						return;
 					}
-					Screen nextScreen = new MainMenuScreen(game, true, match);
-					game.setScreen(nextScreen);
+					game.showConfirmExitDialog();
+					return;
 				}
 
 				// Based on if the game is over and how games were played, show
@@ -392,6 +410,7 @@ public class GameScreen extends Screen
 					{
 						Screen newScreen = new GameScreen(game, match);
 						game.setScreen(newScreen);
+						return;
 					}
 				}
 				else
@@ -416,10 +435,12 @@ public class GameScreen extends Screen
 								Screen nextScreen = new MultiSetupScreen(game, true,
 										match);
 								game.setScreen(nextScreen);
+								return;
 							} else {
 								Screen nextScreen = new GameSetupScreen(game, true,
 										match);
 								game.setScreen(nextScreen);
+								return;
 							}
 						}
 					}
@@ -432,6 +453,7 @@ public class GameScreen extends Screen
 							match.nextGame();
 							Screen nextScreen = new GameScreen(game, match);
 							game.setScreen(nextScreen);
+							return;
 						}
 					}
 				}
@@ -2513,8 +2535,13 @@ public class GameScreen extends Screen
 		{
 			turnStart = timeSinceStart;
 			state = GameState.TapToStart;
+			if (!mDisplayed) {
+				mDisplayed = true;
+				game.displayInterstitial();
+			}
 			if (match.isOnline) {
 				game.showProgressDialog("Waiting for other player...", false);
+				mWaitingForPlayer = true;
 			}
 		}
 	}
@@ -2928,6 +2955,20 @@ public class GameScreen extends Screen
 	
 	public synchronized void startOnlineMatch() {
 		state = GameState.Running;
+		mWaitingForPlayer = false;
 		match.matchStarted = true;
+	}
+	
+	public void exitGame() {
+		if (match.isOnline) 
+		{
+			if (match.matchStarted) {
+				match.loseOnlineGame();
+			}
+			new UnregisterPlayerTask(match.onlineUserId).execute();
+			match.showDialogs = false;
+		}
+		Screen nextScreen = new MainMenuScreen(game, true, match);
+		game.setScreen(nextScreen);
 	}
 }

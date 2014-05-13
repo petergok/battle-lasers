@@ -31,10 +31,6 @@ public class Assets
 	
 	public static Pixmap localMultButtonClck;
 	
-	public static Pixmap puzzleButtonNor;
-	
-	public static Pixmap puzzleButtonClck;
-	
 	public static Pixmap gameModeBackground;
 	
 	public static Pixmap background;
