@@ -9,6 +9,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.pianist.battlelasers.FileIO;
+import com.pianist.battlelasers.R;
 import com.pianist.battlelasers.game_objects.Match;
 import com.pianist.battlelasers.graphics.Graphics;
 import com.pianist.battlelasers.graphics.Pixmap;
@@ -27,6 +28,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -43,11 +45,18 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 /**
@@ -124,6 +133,7 @@ public class BattleLaserActivity extends Activity
 	public static final String PREF_RATING = "pref_rating";
 	public static final String PREF_USER_ID = "pref_user_id";
 	public static final String PREF_GUIDE_COMPLETED = "pref_guide_completed";
+	public static final String PREF_USER_NAME = "pref_user_name";
 	
 	public static int screenHeight;
 	
@@ -132,6 +142,8 @@ public class BattleLaserActivity extends Activity
 	private InterstitialAd interstitial;
 	
 	public boolean showingAd = false;
+	
+	private Vibrator vibrator;
 	
 	private BroadcastReceiver bReceiver = new BroadcastReceiver() {
 	    @Override
@@ -216,11 +228,13 @@ public class BattleLaserActivity extends Activity
 		graphics = new Graphics(getAssets(), frameBuffer);
 		fileIO = new FileIO(this);
 		input = new Input(this, renderView, scaleX, scaleY);
+		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 		
 		mMatch = new Match();
 		settings = getSharedPreferences(BATTLE_LASERS_PREFS, 0);
 	    mMatch.onlineRating = settings.getInt(PREF_RATING, 1000);
 	    mMatch.onlineUserId = settings.getInt(PREF_USER_ID, 0);
+	    mMatch.userName = settings.getString(PREF_USER_NAME, "");
 	    isGuideCompleted = settings.getBoolean(PREF_GUIDE_COMPLETED, false);
 		screen = new MainMenuScreen(this, true, mMatch);
 		setContentView(renderView);
@@ -365,7 +379,7 @@ public class BattleLaserActivity extends Activity
 	 * using the 'from' address in the message.
 	 */
 	private void sendRegistrationIdToBackend() {
-		new SendRegistrationIdTask(this, regid, mMatch.onlineRating).execute();
+		new SendRegistrationIdTask(this, regid, mMatch.onlineRating, mMatch.userName).execute();
 	}
 	
 	/**
@@ -555,8 +569,8 @@ public class BattleLaserActivity extends Activity
 			{
 				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
 				String displayName = otherPlayerName;
-				if (displayName.length() >= 30) {
-					displayName = displayName.substring(0, 30) + "...";
+				if (displayName.length() >= 50) {
+					displayName = displayName.substring(0, 50) + "...";
 				}
 				mAlertDialog = builder.setTitle("Match Found")
 					.setCancelable(false)
@@ -648,6 +662,37 @@ public class BattleLaserActivity extends Activity
 							}
 						}
 					}).create();
+				mAlertDialog.show();
+			}
+		});
+	}
+	
+	public void updateUsername() {
+		final BattleLaserActivity game = this;
+		dismissDialogs();
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run()
+			{
+				LayoutInflater inflater = getLayoutInflater();
+				final EditText input = (EditText)(inflater.inflate(R.layout.edit_text, null).findViewById(R.id.edit_text));
+				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
+				mAlertDialog = builder.setCancelable(false)
+					.setTitle("Enter a Display Name:")
+					.setPositiveButton("Finish", new OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which)
+						{
+							if (input.getText() != null && !TextUtils.isEmpty(input.getText().toString())) {
+								mMatch.userName = input.getText().toString();
+								SharedPreferences.Editor editor = settings.edit();
+							    editor.putString(PREF_USER_NAME, mMatch.userName);
+							    editor.commit();
+							    registerGCM();
+							}
+						}
+					}).create();
+				mAlertDialog.setView(input);
 				mAlertDialog.show();
 			}
 		});
@@ -774,8 +819,16 @@ public class BattleLaserActivity extends Activity
 			public void run()
 			{
 				if (interstitial.isLoaded()) {
-					showingAd = true;
 			    	interstitial.show();
+			    	
+			    	showingAd = true;
+			    	
+			    	interstitial.setAdListener(new AdListener() {
+				    	@Override
+				    	public void onAdClosed() {
+				    		showingAd = false;
+				    	}
+				    });
 			    	
 			    	// Create the interstitial.
 				    interstitial = new InterstitialAd(activity);
@@ -786,15 +839,16 @@ public class BattleLaserActivity extends Activity
 
 				    // Begin loading your interstitial.
 				    interstitial.loadAd(adRequest);
-				    
-				    interstitial.setAdListener(new AdListener() {
-				    	@Override
-				    	public void onAdClosed() {
-				    		showingAd = false;
-				    	}
-				    });
+			    } else {
+			    	showingAd = false;
 			    }
 			}
 		});
+	}
+	
+	public void vibrate(int length) {
+		if (vibrator != null) {
+			vibrator.vibrate(length);
+		}
 	}
 }

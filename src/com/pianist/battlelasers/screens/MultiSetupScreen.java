@@ -2,6 +2,8 @@ package com.pianist.battlelasers.screens;
 
 import java.util.List;
 
+import android.text.TextUtils;
+
 import com.pianist.battlelasers.Assets;
 import com.pianist.battlelasers.activities.BattleLaserActivity;
 import com.pianist.battlelasers.game_objects.Button;
@@ -287,7 +289,11 @@ public class MultiSetupScreen extends Screen
 			{
 				match.onlineUserId = BattleLaserActivity.settings.getInt(BattleLaserActivity.PREF_USER_ID, 0);
 				game.showProgressDialog("Connecting to server...", true);
-				game.registerGCM();
+				if (TextUtils.isEmpty(match.userName)) {
+					game.updateUsername();
+				} else {
+					game.registerGCM();
+				}
 			}
 		}
 	}

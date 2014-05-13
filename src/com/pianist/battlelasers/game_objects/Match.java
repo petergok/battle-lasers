@@ -19,6 +19,8 @@ public class Match
 {
 	public boolean onePlayer;
 	
+	public String userName;
+	
 	public boolean isOnline;
 	
 	public String otherPlayerName;
@@ -96,6 +98,7 @@ public class Match
 	public Match()
 	{
 		onePlayer = false;
+		userName = "";
 		isOnline = false;
 		playerNumberForOnline = 0;
 		numGames = 3;
@@ -232,13 +235,15 @@ public class Match
 	public void loseOnlineGame() {
 		matchStarted = false;
 		endMatch = true;
-		onlineRating -= 100;
+		double expectedScore = 1 / (1 + Math.pow(10, (otherPlayerRating - onlineRating) / 400));
+		onlineRating += Math.round(50 * (0 - expectedScore));
 	}
 	
 	public void winOnlineGame() {
 		matchStarted = false;
 		endMatch = true;
-		onlineRating += 100;
+		double expectedScore = 1 / (1 + Math.pow(10, (otherPlayerRating - onlineRating) / 400));
+		onlineRating += Math.round(50 * (1 - expectedScore));
 	}
 
 	/**

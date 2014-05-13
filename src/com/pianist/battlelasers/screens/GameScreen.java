@@ -2168,6 +2168,7 @@ public class GameScreen extends Screen
 				game.loseOnlineGame();
 			}
 		}
+		game.vibrate(500);
 		if (match.isOnline && playerOneTurn) {
 			new MakeMoveTask(null, null, playerOne.getDirection() == 2, match.onlineUserId).execute();
 		}
@@ -2889,6 +2890,7 @@ public class GameScreen extends Screen
 			move.needToTurnRight();
 		}
 		makeMove(move);
+		game.vibrate(250);
 	}
 	
 	public Match getMatch() {

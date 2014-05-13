@@ -26,11 +26,13 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
 	private BattleLaserActivity mActivity;
 	private String mRegId;
 	private int mRating;
+	private String mUserName;
 	
-	public SendRegistrationIdTask(BattleLaserActivity activity, String regId, int rating) {
+	public SendRegistrationIdTask(BattleLaserActivity activity, String regId, int rating, String userName) {
 		mRegId = regId;
 		mRating = rating;
 		mActivity = activity;
+		mUserName = userName;
 	}
 	
 	@Override
@@ -43,9 +45,10 @@ public class SendRegistrationIdTask extends AsyncTask<Void, Void, String>
         try {
         	HttpPut method = new HttpPut(uri);
         	
-        	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+        	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
             nameValuePairs.add(new BasicNameValuePair("registrationId", mRegId));
             nameValuePairs.add(new BasicNameValuePair("rating", "" + mRating));
+            nameValuePairs.add(new BasicNameValuePair("userName", mUserName));
             method.setEntity(new UrlEncodedFormEntity(nameValuePairs));
         	
             response = httpclient.execute(method);
