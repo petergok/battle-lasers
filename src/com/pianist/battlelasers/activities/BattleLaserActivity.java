@@ -819,9 +819,9 @@ public class BattleLaserActivity extends Activity
 			public void run()
 			{
 				if (interstitial.isLoaded()) {
+					showingAd = true;
+					
 			    	interstitial.show();
-			    	
-			    	showingAd = true;
 			    	
 			    	interstitial.setAdListener(new AdListener() {
 				    	@Override

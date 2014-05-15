@@ -133,6 +133,8 @@ public class GameScreen extends Screen
 	private boolean mForfeitDialogShown;
 	
 	private boolean mDisplayed;
+	
+	private boolean mDispose = true;
 
 	/**
 	 * The GameState describes all the states that the game could be in
@@ -408,6 +410,7 @@ public class GameScreen extends Screen
 					}
 					else if (!match.isOnline && restartButton.wasReleased())
 					{
+						mDispose = false;
 						Screen newScreen = new GameScreen(game, match);
 						game.setScreen(newScreen);
 						return;
@@ -450,6 +453,7 @@ public class GameScreen extends Screen
 								nextEvent.type);
 						if (!match.isOnline && nextButton.wasReleased())
 						{
+							mDispose = false;
 							match.nextGame();
 							Screen nextScreen = new GameScreen(game, match);
 							game.setScreen(nextScreen);
@@ -2854,7 +2858,7 @@ public class GameScreen extends Screen
 		{
 			presentGameScreen();
 			Graphics g = game.getGraphics();
-			if (!match.isOnline) {
+			if (!match.isOnline && !game.showingAd) {
 				g.drawPixmap(Assets.tapToStart,
 						240 - Assets.tapToStart.getWidth() / 2, 285);
 			}
@@ -2925,7 +2929,9 @@ public class GameScreen extends Screen
 	 */
 	public synchronized void dispose()
 	{
-		disposeAnimationImages();
+		if (mDispose) {
+			disposeAnimationImages();
+		}
 		
 		game.disposeImage(Assets.laserBounBottom);
 		game.disposeImage(Assets.laserBounLeft);
