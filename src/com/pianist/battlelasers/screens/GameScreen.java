@@ -2858,7 +2858,7 @@ public class GameScreen extends Screen
 		{
 			presentGameScreen();
 			Graphics g = game.getGraphics();
-			if (!match.isOnline && !game.showingAd) {
+			if (!match.isOnline) {
 				g.drawPixmap(Assets.tapToStart,
 						240 - Assets.tapToStart.getWidth() / 2, 285);
 			}
