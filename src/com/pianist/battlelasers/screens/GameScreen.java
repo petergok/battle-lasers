@@ -358,7 +358,7 @@ public class GameScreen extends Screen
 				{
 					state = GameState.Running;
 				}
-				return;
+				continue;
 			}
 
 			// If the state is to run out of time and the event was an up event
@@ -372,7 +372,7 @@ public class GameScreen extends Screen
 					lastMoveEnd = null;
 					changeTurns();
 				}
-				return;
+				continue;
 			}
 
 			/**
@@ -461,7 +461,7 @@ public class GameScreen extends Screen
 						}
 					}
 				}
-				return;
+				continue;
 			}
 			// If the game is not animating the laser and it is not showing the
 			// menu, update the top buttons
@@ -519,7 +519,7 @@ public class GameScreen extends Screen
 				if (letRelease)
 				{
 					letRelease = false;
-					return;
+					continue;
 				}
 
 				// If a player won a game and it is showing the winner pop-up,
@@ -531,7 +531,7 @@ public class GameScreen extends Screen
 						showWinner = false;
 						showMenu = true;
 					}
-					return;
+					continue;
 				}
 
 				// If the game is animating the laser, finish the animation
@@ -539,7 +539,7 @@ public class GameScreen extends Screen
 				{
 					state = GameState.Running;
 					laserDrawEnd = timeSinceStart;
-					return;
+					continue;
 				}
 				// Otherwise, if it already finished the animation, switch turns
 				else if (shootLaser)
