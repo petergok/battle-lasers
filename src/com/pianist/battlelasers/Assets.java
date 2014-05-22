@@ -7,7 +7,6 @@ import com.pianist.battlelasers.graphics.Pixmap;
  * variables, so that they can be recovered and used easily
  * 
  * @author Alex Szoke & Peter Gokhshteyn
- * @version Date: June 16, 2013
  */
 public class Assets
 {

@@ -13,7 +13,6 @@ import android.graphics.Point;
  * more then half of them wins the match
  * 
  * @author Alex Szoke & Peter Gokhshteyn
- * @version Date: June 16, 2013
  */
 public class Match
 {
@@ -45,11 +44,11 @@ public class Match
 
 	public Layout currentLayout;
 
-	private Layout[] layouts;
+	public Layout[] layouts;
 
 	public int gameNumber;
 
-	private boolean nextGameStarted;
+	public boolean nextGameStarted;
 
 	public AIDifficulty computerDifficulty;
 	
@@ -78,6 +77,9 @@ public class Match
 		endMatch = false;
 	}
 	
+	/**
+	 * Resets the match back to the intial parameters for an online game
+	 */
 	public void resetOnline()
 	{
 		reset();
@@ -232,6 +234,9 @@ public class Match
 		return layouts[id];
 	}
 	
+	/**
+	 * Called when the user loses an online game, this method updates the user's rating using an elo formula
+	 */
 	public void loseOnlineGame() {
 		matchStarted = false;
 		endMatch = true;
@@ -239,6 +244,9 @@ public class Match
 		onlineRating += Math.round(50 * (0 - expectedScore));
 	}
 	
+	/**
+	 * Called when the user wins an online game, this method updates the user's rating using an elo formula
+	 */
 	public void winOnlineGame() {
 		matchStarted = false;
 		endMatch = true;

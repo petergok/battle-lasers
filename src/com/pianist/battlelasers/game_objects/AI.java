@@ -12,7 +12,6 @@ import android.graphics.Point;
  * ever repeat the same grid configuration to make the game more fun.
  * 
  * @author Peter Gokhshteyn and Alex Szoke
- * @version June 15, 2013
  */
 public class AI implements Runnable
 {

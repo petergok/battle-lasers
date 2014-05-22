@@ -66,7 +66,6 @@ import android.widget.Toast;
  * files.
  * 
  * @author Alex Szoke & Peter Gokhshteyn
- * @version Date: June 16, 2013
  */
 public class BattleLaserActivity extends Activity
 {
@@ -98,6 +97,8 @@ public class BattleLaserActivity extends Activity
     public static final String PROPERTY_REG_ID = "registration_id";
     private static final String PROPERTY_APP_VERSION = "appVersion";
 	private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
+	
+	// Server Address
 	public static final String BASE_URL = "http://mysterious-wave-3427.herokuapp.com";
 	
 	/**
@@ -113,13 +114,15 @@ public class BattleLaserActivity extends Activity
 	// Context
 	private Context mContext;
 	
+	// Dialog variables
 	private ProgressDialog mProgressDialog;
-	
 	private AlertDialog mAlertDialog;
 	
+	// The match object that contains game data
 	private Match mMatch;
 	
-	public boolean isGuideCompleted;
+	// Whether the guide was completed yet
+	private boolean mIsGuideCompleted;
 	
 	// Preferences file
 	public static SharedPreferences settings;
@@ -135,29 +138,39 @@ public class BattleLaserActivity extends Activity
 	public static final String PREF_GUIDE_COMPLETED = "pref_guide_completed";
 	public static final String PREF_USER_NAME = "pref_user_name";
 	
-	public static int screenHeight;
+	// Store the screen height 
+	private static int mScreenHeight;
 	
+	// Store the admob ad unit id and interstial ad
 	private String MY_AD_UNIT_ID = "ca-app-pub-6108834597007793/9286444460";
-	
 	private InterstitialAd interstitial;
 	
-	public boolean showingAd = false;
+	// Whether the ad is current showing
+	private boolean mShowingAd = false;
 	
+	// Vibration handler
 	private Vibrator vibrator;
 	
+	/**
+	 * A broadcast reciever that is used to recieve broadcasts from the GCM reciever
+	 */
 	private BroadcastReceiver bReceiver = new BroadcastReceiver() {
 	    @Override
 	    public void onReceive(Context context, Intent intent) {
 	        if(intent.getAction().equals(MATCH_FOUND)) {
+	        	// If a match was found, hide dialogs and update user data
 	        	mMatch.showDialogs = true;
 	        	String otherPlayerName = intent.getStringExtra("otherPlayerName");
 	        	int playerNumber = intent.getIntExtra("playerNumber", 0);
 	        	int otherPlayerRating = intent.getIntExtra("otherPlayerRating", 1000);
 	        	int mapId = intent.getIntExtra("mapId", 1);
+	        	
+	        	// Notify the screen that the a match was found
 	        	if (screen instanceof MultiSetupScreen) {
 	    			((MultiSetupScreen) screen).createdMatch(otherPlayerName, mapId, playerNumber, otherPlayerRating);
 	    		}
 	        } else if (intent.getAction().equals(MOVE)) {
+	        	// If a move was made, retrieve the move data and verify that it is a valid move
 	        	Point moveStart = new Point(intent.getIntExtra("startRow", -1), intent.getIntExtra("startCol", -1));
 	        	Point moveEnd = new Point(intent.getIntExtra("endRow", -1), intent.getIntExtra("endCol", -1));
 	        	boolean turnRight = intent.getBooleanExtra("turnRight", false);
@@ -166,20 +179,26 @@ public class BattleLaserActivity extends Activity
 	        		moveStart = null;
 	        		moveEnd = null;
 	        	}
+	        	
+	        	// Notify the game screen that a move was made
 	        	if (screen instanceof GameScreen) {
 	        		((GameScreen) screen).onlineMoveMade(moveStart, moveEnd, turnRight);
 	        	}
 	        } else if (intent.getAction().equals(MATCH_END)) {
+	        	// If the match ended, unregister the player and show an appropriate dialog
 	        	new UnregisterPlayerTask(mMatch.onlineUserId).execute();
 	        	if (!mMatch.matchStarted && !mMatch.endMatch && (screen instanceof MultiSetupScreen || screen instanceof GameScreen)) {
 	        		showUserDeclinedDialog();
 	        	} else if (mMatch.matchStarted) {
 	        		showUserForfeitDialog(false);
 	        	}
+	        	
+	        	// Update the user's rating to the shared preferences
 	        	SharedPreferences.Editor editor = BattleLaserActivity.settings.edit();
 	    	    editor.putInt(BattleLaserActivity.PREF_USER_ID, 0);
 	    	    editor.commit();
 	        } else if (intent.getAction().equals(MATCH_START)) {
+	        	// Notify the game screen if the match has started
 	        	if (screen instanceof GameScreen) {
 	        		dismissDialogs();
 	        		((GameScreen) screen).startOnlineMatch();
@@ -217,25 +236,30 @@ public class BattleLaserActivity extends Activity
 
 		// Gets the scale factor between the screen and buffer to handle user
 		// input
-		screenHeight = getResources().getDisplayMetrics().heightPixels;
+		mScreenHeight = getResources().getDisplayMetrics().heightPixels;
 		float scaleX = (float) frameBufferWidth
 				/ getResources().getDisplayMetrics().widthPixels;
 		float scaleY = (float) frameBufferHeight
-				/ screenHeight;
+				/ mScreenHeight;
 
 		// Create all the objects that run the game
 		renderView = new RenderGraphics(frameBuffer, this);
 		graphics = new Graphics(getAssets(), frameBuffer);
 		fileIO = new FileIO(this);
 		input = new Input(this, renderView, scaleX, scaleY);
+		
+		// Create the vibration handler
 		vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 		
+		// Retrieve user data from shared preferences
 		mMatch = new Match();
 		settings = getSharedPreferences(BATTLE_LASERS_PREFS, 0);
 	    mMatch.onlineRating = settings.getInt(PREF_RATING, 1000);
 	    mMatch.onlineUserId = settings.getInt(PREF_USER_ID, 0);
 	    mMatch.userName = settings.getString(PREF_USER_NAME, "");
-	    isGuideCompleted = settings.getBoolean(PREF_GUIDE_COMPLETED, false);
+	    mIsGuideCompleted = settings.getBoolean(PREF_GUIDE_COMPLETED, false);
+	    
+	    // Create the screen and set the view to the render view that was created
 		screen = new MainMenuScreen(this, true, mMatch);
 		setContentView(renderView);
 		
@@ -251,6 +275,7 @@ public class BattleLaserActivity extends Activity
 		
 		mContext = getApplicationContext();
 		
+		// Register the broadcast reciever
 		LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
 		IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(MATCH_START);
@@ -260,31 +285,34 @@ public class BattleLaserActivity extends Activity
 		bManager.registerReceiver(bReceiver, intentFilter);
 	}
 	
+	/**
+	 * Registers this current device for GCM
+	 */
 	public void registerGCM() {
-		
-		// Check device for Play Services APK.
 	    if (checkPlayServices()) {
-	        // If this check succeeds, proceed with normal processing.
-	        // Otherwise, prompt user to get valid Play Services APK
 	    	gcm = GoogleCloudMessaging.getInstance(this);
             regid = getRegistrationId(mContext);
 
+            // If the registration id is empty, then this device hasn't registered yet and it needs to register,
+            // otherwise, send the old registration id to the server
             if (regid.isEmpty()) {
                 registerInBackground();
             } else {
             	sendRegistrationIdToBackend();
             }
-	    	
 	    } else {
 	    	Log.i(TAG, "No valid Google Play Services APK found.");
 	    }
 	}
 	
+	/**
+	 * Called when the guide was started so it's only shown once
+	 */
 	public void guideStarted() {
 		SharedPreferences.Editor editor = settings.edit();
 	    editor.putBoolean(PREF_GUIDE_COMPLETED, true);
 	    editor.commit();
-	    isGuideCompleted = true;
+	    mIsGuideCompleted = true;
 	}
 	
 	/**
@@ -296,13 +324,15 @@ public class BattleLaserActivity extends Activity
 	 *         registration ID.
 	 */
 	private String getRegistrationId(Context context) {
+		// Get the registration id from shared preferences
 	    final SharedPreferences prefs = getGCMPreferences(context);
 	    String registrationId = prefs.getString(PROPERTY_REG_ID, "");
 	    if (registrationId.isEmpty()) {
 	        Log.i(TAG, "Registration not found.");
 	        return "";
 	    }
-	    // Check if app was updated; if so, it must clear the registration ID
+	    
+	    // Check if app was updated. If so, it must clear the registration ID
 	    // since the existing regID is not guaranteed to work with the new
 	    // app version.
 	    int registeredVersion = prefs.getInt(PROPERTY_APP_VERSION, Integer.MIN_VALUE);
@@ -318,8 +348,6 @@ public class BattleLaserActivity extends Activity
 	 * @return Application's {@code SharedPreferences}.
 	 */
 	private SharedPreferences getGCMPreferences(Context context) {
-	    // This sample app persists the registration ID in shared preferences, but
-	    // how you store the regID in your app is up to you.
 	    return getSharedPreferences(BattleLaserActivity.class.getSimpleName(),
 	            Context.MODE_PRIVATE);
 	}
@@ -333,7 +361,6 @@ public class BattleLaserActivity extends Activity
 	                .getPackageInfo(context.getPackageName(), 0);
 	        return packageInfo.versionCode;
 	    } catch (NameNotFoundException e) {
-	        // should never happen
 	        throw new RuntimeException("Could not get package name: " + e);
 	    }
 	}
@@ -356,9 +383,8 @@ public class BattleLaserActivity extends Activity
 	                regid = gcm.register(SENDER_ID);
 	                msg = "Device registered, registration ID=" + regid;
 
+	                // Send the registration id to the server and store it in shared preferences
 	                sendRegistrationIdToBackend();
-
-	                // Persist the regID - no need to register again.
 	                storeRegistrationId(mContext, regid);
 	            } catch (IOException ex) {
 	                msg = "Error :" + ex.getMessage();
@@ -373,10 +399,7 @@ public class BattleLaserActivity extends Activity
 	}
 	
 	/**
-	 * Sends the registration ID to your server over HTTP, so it can use GCM/HTTP
-	 * or CCS to send messages to your app. Not needed for this demo since the
-	 * device sends upstream messages to a server that echoes back the message
-	 * using the 'from' address in the message.
+	 * Sends the registration ID to the server
 	 */
 	private void sendRegistrationIdToBackend() {
 		new SendRegistrationIdTask(this, regid, mMatch.onlineRating, mMatch.userName).execute();
@@ -424,19 +447,24 @@ public class BattleLaserActivity extends Activity
 	
 	@Override
 	public void onStop() {
+		// When the game is stopped, unregister the player depending on what part of the online registration
+		// process they are at. This helps keep the server in sync.
 		if (mMatch != null && mMatch.onlineUserId != 0 && mMatch.matchStarted) {
-			if (!showingAd) {
+			if (!mShowingAd) {
 				loseOnlineGame();
 				new UnregisterPlayerTask(mMatch.onlineUserId).execute();
 			}
 		} else if (mMatch != null && mMatch.isOnline) {
-			if (!showingAd) {
+			if (!mShowingAd) {
 				new UnregisterPlayerTask(mMatch.onlineUserId).execute();
 			}
 		}
 		super.onStop();
 	}
 	
+	/**
+	 * Called when user loses an online game to update and store the rating
+	 */
 	public void loseOnlineGame() {
 		mMatch.loseOnlineGame();
 		SharedPreferences.Editor editor = settings.edit();
@@ -444,6 +472,9 @@ public class BattleLaserActivity extends Activity
 	    editor.commit();
 	}
 	
+	/**
+	 * Called when user wins an online game to update and store the rating
+	 */
 	public void winOnlineGame() {
 		mMatch.winOnlineGame();
 		SharedPreferences.Editor editor = settings.edit();
@@ -545,6 +576,11 @@ public class BattleLaserActivity extends Activity
 	    return true;
 	}
 	
+	/**
+	 * Called when the user is registered and notifies the proper screen of this event
+	 * 
+	 * @param userId the user id given from the registration
+	 */
 	public void registeredUser(int userId) {
 		SharedPreferences.Editor editor = settings.edit();
 	    editor.putInt(PREF_USER_ID, userId);
@@ -556,6 +592,12 @@ public class BattleLaserActivity extends Activity
 		}
 	}
 	
+	/**
+	 * Shows the new match dialog
+	 * 
+	 * @param otherPlayerName the name of the other player
+	 * @param otherPlayerRating the other player's rating
+	 */
 	public void showNewMatchDialog(final String otherPlayerName, final int otherPlayerRating) {
 		if (!mMatch.showDialogs) {
 			return;
@@ -567,11 +609,16 @@ public class BattleLaserActivity extends Activity
 			@Override
 			public void run()
 			{
+				// Crate a new dialog
 				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
+				
+				// If the player name is too long, shorten it
 				String displayName = otherPlayerName;
 				if (displayName.length() >= 50) {
 					displayName = displayName.substring(0, 50) + "...";
 				}
+				
+				// Set the dialog properties
 				mAlertDialog = builder.setTitle("Match Found")
 					.setCancelable(false)
 					.setMessage("Player Name: " + displayName + "\n\n" + "Rating: " + otherPlayerRating)
@@ -579,6 +626,7 @@ public class BattleLaserActivity extends Activity
 						@Override
 						public void onClick(DialogInterface dialog, int which)
 						{
+							// If the accept button is clicked, notify the server and screen
 							new AcceptMatchTask(mMatch.onlineUserId).execute();
 							if (screen instanceof MultiSetupScreen) {
 								((MultiSetupScreen) screen).startMatch();
@@ -588,6 +636,7 @@ public class BattleLaserActivity extends Activity
 						@Override
 						public void onClick(DialogInterface dialog, int which)
 						{
+							// If the decline button is clicked, notify the server and screen
 							if (screen instanceof MultiSetupScreen) {
 								new DeclineMatchTask(mMatch.onlineUserId).execute();
 				    		}
@@ -599,6 +648,9 @@ public class BattleLaserActivity extends Activity
 		});
 	}
 	
+	/**
+	 * Shows a dialog when the other user declines a match
+	 */
 	public void showUserDeclinedDialog() {
 		if (!mMatch.showDialogs) {
 			return;
@@ -610,6 +662,7 @@ public class BattleLaserActivity extends Activity
 			@Override
 			public void run()
 			{
+				// Create and set the properties of the dialog
 				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
 				mAlertDialog = builder.setTitle("Match Declined")
 					.setCancelable(false)
@@ -618,6 +671,7 @@ public class BattleLaserActivity extends Activity
 						@Override
 						public void onClick(DialogInterface dialog, int which)
 						{
+							// Reregister the player when they dismiss the dialog
 							if (screen instanceof GameScreen) {
 								Screen nextScreen = new MultiSetupScreen(game, true,
 										mMatch);
@@ -632,6 +686,11 @@ public class BattleLaserActivity extends Activity
 		});
 	}
 	
+	/**
+	 * Dialog shows when the other user forfeit
+	 * 
+	 * @param disconnected whether the forfeit occurred because of a disconnection
+	 */
 	public void showUserForfeitDialog(final boolean disconnected) {
 		if (!mMatch.showDialogs) {
 			return;
@@ -643,6 +702,7 @@ public class BattleLaserActivity extends Activity
 			@Override
 			public void run()
 			{
+				// Create a dialog and set its properties based on the type of forfeit
 				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
 				mAlertDialog = builder.setTitle("Game Over")
 					.setCancelable(false)
@@ -651,6 +711,8 @@ public class BattleLaserActivity extends Activity
 						@Override
 						public void onClick(DialogInterface dialog, int which)
 						{
+							// Depending on the location of the user in the game flow when the other player disconnects,
+							// notify the correct screen and either reregister or win the game
 							if (screen instanceof GameScreen) {
 								Screen nextScreen = new MultiSetupScreen(game, true,
 										mMatch);
@@ -667,13 +729,18 @@ public class BattleLaserActivity extends Activity
 		});
 	}
 	
+	/**
+	 * Dialog displayed to update the user's name
+	 */
 	public void updateUsername() {
 		final BattleLaserActivity game = this;
 		dismissDialogs();
+		
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run()
 			{
+				// Inflate the edit text view and add it to the dialog
 				LayoutInflater inflater = getLayoutInflater();
 				final EditText input = (EditText)(inflater.inflate(R.layout.edit_text, null).findViewById(R.id.edit_text));
 				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
@@ -683,6 +750,7 @@ public class BattleLaserActivity extends Activity
 						@Override
 						public void onClick(DialogInterface dialog, int which)
 						{
+							// When the user finishes, update the shared preferences with the new name
 							if (input.getText() != null && !TextUtils.isEmpty(input.getText().toString())) {
 								mMatch.userName = input.getText().toString();
 								SharedPreferences.Editor editor = settings.edit();
@@ -698,13 +766,18 @@ public class BattleLaserActivity extends Activity
 		});
 	}
 	
+	/**
+	 * Shows the dialog that confirms if a user wants to exit. This is shown when a user tries to exit mid-game
+	 */
 	public void showConfirmExitDialog() {
 		final BattleLaserActivity game = this;
 		dismissDialogs();
+		
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run()
 			{
+				// Create the dialog and set its properties
 				AlertDialog.Builder builder = new AlertDialog.Builder(game, AlertDialog.THEME_HOLO_DARK);
 				mAlertDialog = builder.setTitle("Warning")
 					.setCancelable(false)
@@ -713,6 +786,7 @@ public class BattleLaserActivity extends Activity
 						@Override
 						public void onClick(DialogInterface dialog, int which)
 						{
+							// If the user confirms, exit the game
 							if (screen instanceof GameScreen) {
 								((GameScreen) screen).exitGame();
 							}
@@ -724,18 +798,29 @@ public class BattleLaserActivity extends Activity
 		});
 	}
 	
+	/**
+	 * Shows a progress dialog with the given text
+	 * 
+	 * @param text the text to display
+	 * @param canceleable whether the dialog is canceleable
+	 */
 	public void showProgressDialog(final String text, final boolean canceleable) {
 		final BattleLaserActivity game = this;
 		dismissAlertDialog();
+		
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run()
 			{
+				// If a dialog is already showing, update the old one, otherwise create a new one
 				if (mProgressDialog == null || !mProgressDialog.isShowing()) {
 					mProgressDialog = new ProgressDialog(game, ProgressDialog.THEME_HOLO_DARK);
+					
+					// Move the dialog over the start match button
 					WindowManager.LayoutParams wmlp = mProgressDialog.getWindow().getAttributes();
-					wmlp.y = screenHeight / 18;
+					wmlp.y = mScreenHeight / 18;
 					mProgressDialog.getWindow().setAttributes(wmlp);
+					
 					mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 					mProgressDialog.setMessage(text);
 					mProgressDialog.setCancelable(canceleable);
@@ -743,6 +828,7 @@ public class BattleLaserActivity extends Activity
 						@Override
 						public void onCancel(DialogInterface dialog)
 						{
+							// If the user canceled, unregister them from the server
 							new UnregisterPlayerTask(mMatch.onlineUserId).execute();
 							mMatch.showDialogs = false;
 						}
@@ -755,6 +841,7 @@ public class BattleLaserActivity extends Activity
 						@Override
 						public void onCancel(DialogInterface dialog)
 						{
+							// If the user canceled, unregister them from the server
 							new UnregisterPlayerTask(mMatch.onlineUserId).execute();
 							mMatch.showDialogs = false;
 						}
@@ -765,29 +852,43 @@ public class BattleLaserActivity extends Activity
 		});
 	}
 	
+	/**
+	 * Dismisses the progress dialog
+	 */
 	public void dismissProgressDialog() {
 		if (mProgressDialog != null) {
 			mProgressDialog.dismiss();
 		}
 	}
 	
+	/**
+	 * Dismisses the alert dialog
+	 */
 	public void dismissAlertDialog() {
 		if (mAlertDialog != null) {
 			mAlertDialog.dismiss();
 		}
 	}
 	
+	/**
+	 * Dismisses any dialogs that are open
+	 */
 	public void dismissDialogs() {
 		dismissProgressDialog();
 		dismissAlertDialog();
 	}
 	
+	/**
+	 * Checks the network connection and if it isn't available, notify the user that they need to connect to the internet
+	 */
 	public void checkNetworkConnection() {
 		dismissDialogs();
 		final BattleLaserActivity game = this;
+		
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
+				// Check if the network is available and notify the user of the device state accordingly
 				if (isNetworkAvailable()) {
 					Toast.makeText(game, "An error occured while connecting", Toast.LENGTH_SHORT).show();
 				} else {
@@ -800,6 +901,11 @@ public class BattleLaserActivity extends Activity
 		});
 	}
 	
+	/**
+	 * Checks if the network is available
+	 * 
+	 * @return if the network is available
+	 */
 	private boolean isNetworkAvailable() {
 	    ConnectivityManager connectivityManager 
 	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -807,10 +913,18 @@ public class BattleLaserActivity extends Activity
 	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
 	
+	/**
+	 * Returns if a dialog is showing
+	 * 
+	 * @return if a dialog is showing
+	 */
 	public boolean isDialogShowing() {
 		return (mAlertDialog != null && mAlertDialog.isShowing()) || mProgressDialog != null && mProgressDialog.isShowing();
 	}
 	
+	/**
+	 * Displays the interstitial ad and loads another one immediately for next time
+	 */
 	public void displayInterstitial() {
 		final BattleLaserActivity activity = this;
 		runOnUiThread(new Runnable() {
@@ -819,14 +933,14 @@ public class BattleLaserActivity extends Activity
 			public void run()
 			{
 				if (interstitial.isLoaded()) {
-					showingAd = true;
+					mShowingAd = true;
 					
 			    	interstitial.show();
 			    	
 			    	interstitial.setAdListener(new AdListener() {
 				    	@Override
 				    	public void onAdClosed() {
-				    		showingAd = false;
+				    		mShowingAd = false;
 				    	}
 				    });
 			    	
@@ -837,18 +951,35 @@ public class BattleLaserActivity extends Activity
 					// Create ad request.
 				    AdRequest adRequest = new AdRequest.Builder().build();
 
-				    // Begin loading your interstitial.
+				    // Begin loading the interstitial.
 				    interstitial.loadAd(adRequest);
 			    } else {
-			    	showingAd = false;
+			    	mShowingAd = false;
 			    }
 			}
 		});
 	}
 	
+	/**
+	 * Vibrate the phone for a given length
+	 * 
+	 * @param length the length to vibrate the phone for
+	 */
 	public void vibrate(int length) {
 		if (vibrator != null) {
 			vibrator.vibrate(length);
 		}
+	}
+	
+	public void setGuideCompleted(boolean completed) {
+		mIsGuideCompleted = completed;
+	}
+	
+	public boolean isGuideCompleted() {
+		return mIsGuideCompleted;
+	}
+	
+	public boolean isShowingAd() {
+		return mShowingAd;
 	}
 }

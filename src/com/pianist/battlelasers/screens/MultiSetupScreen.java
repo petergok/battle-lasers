@@ -15,20 +15,27 @@ import com.pianist.battlelasers.input_handlers.Input;
 import com.pianist.battlelasers.input_handlers.Input.KeyEvent;
 import com.pianist.battlelasers.input_handlers.Input.TouchEvent;
 
+/**
+ * The MultiSetupScreen class is called when preparing than online game, it acts as a
+ * game lobby for the online matching process
+ * 
+ * @author Peter Gokhshteyn
+ */
 public class MultiSetupScreen extends Screen
 {
+	// Whether to laod the images
 	private boolean loadImages;
 	
+	// The navigation buttons 
 	private Button leftButton;
-	
 	private Button matchSearchButton;
 	
+	// Match object that is passed from screen to screen
 	private Match match;
 	
+	// Loading states
 	private boolean startingGame;
-	
 	private boolean loaded;
-	
 	private boolean paused;
 	
 	public MultiSetupScreen(BattleLaserActivity game, boolean loadImages, Match match) {
@@ -45,11 +52,24 @@ public class MultiSetupScreen extends Screen
 		paused = false;
 	}
 	
+	/**
+	 * Called when the user is registered
+	 * 
+	 * @param id the id that the server passed back
+	 */
 	public synchronized void registeredUser(int id) {
 		game.showProgressDialog("Looking for a match...", true);
 		match.onlineUserId = id;
 	}
 	
+	/**
+	 * Called when a match is created
+	 * 
+	 * @param otherPlayerName other player's name
+	 * @param mapId the map that this match is played on
+	 * @param playerNumber which player this user is (1 or 2)
+	 * @param otherPlayerRating the other player rating
+	 */
 	public synchronized void createdMatch(String otherPlayerName, int mapId, int playerNumber, int otherPlayerRating) {
 		game.dismissProgressDialog();
 		game.showNewMatchDialog(otherPlayerName, otherPlayerRating);
@@ -59,6 +79,9 @@ public class MultiSetupScreen extends Screen
 		match.currentLayout = match.getLayout(mapId);
 	}
 	
+	/**
+	 * Called when the match has started
+	 */
 	public synchronized void startMatch() {
 		startingGame = true;
 		Screen screen = new GameScreen(game, match);
@@ -279,6 +302,7 @@ public class MultiSetupScreen extends Screen
 				matchSearchButton.click(nextEvent.x, nextEvent.y, nextEvent.type);
 			}
 			
+			// If the left button was released, go back to the game mode screen
 			if (leftButton.wasReleased())
 			{
 				Screen screen = new GameModeScreen(game, match);
@@ -287,6 +311,7 @@ public class MultiSetupScreen extends Screen
 			}
 			else if (matchSearchButton.wasReleased()) 
 			{
+				// If the search button was released, register for gcm which registers the user with the server
 				match.onlineUserId = BattleLaserActivity.settings.getInt(BattleLaserActivity.PREF_USER_ID, 0);
 				game.showProgressDialog("Connecting to server...", true);
 				if (TextUtils.isEmpty(match.userName)) {

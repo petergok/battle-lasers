@@ -18,7 +18,6 @@ import android.preference.PreferenceManager;
  * loading images)
  * 
  * @author Peter Gokhshteyn and "Apress Beginning Android Games"
- * @version May 14, 2013
  */
 public class FileIO
 {

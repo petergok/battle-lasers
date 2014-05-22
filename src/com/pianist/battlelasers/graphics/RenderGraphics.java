@@ -14,7 +14,6 @@ import android.view.SurfaceView;
  * keeps track of the time between frames.
  * 
  * @author Peter Gokhshteyn
- * @version May 26, 2013
  */
 public class RenderGraphics extends SurfaceView implements Runnable {
 	BattleLaserActivity game;

@@ -21,7 +21,6 @@ import com.pianist.battlelasers.input_handlers.Input.TouchEvent;
  * game starts up and the buttons on it
  * 
  * @author Alex Szoke & Peter Gokhshteyn
- * @version Date: June 16, 2013
  */
 public class MainMenuScreen extends Screen
 {
@@ -310,7 +309,7 @@ public class MainMenuScreen extends Screen
 			// Change screens or state based on what button was pressed
 			if (playGameButton.wasReleased())
 			{
-				if (game.isGuideCompleted) {
+				if (game.isGuideCompleted()) {
 					Screen screen = new GameModeScreen(game, match);
 					game.setScreen(screen);
 				} else {

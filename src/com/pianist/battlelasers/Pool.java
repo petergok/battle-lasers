@@ -7,7 +7,6 @@ import java.util.List;
  * The Pool Object describes a pool of elements that can easily be accessed
  * 
  * @author Apress Beginning Android Games 
- * @version June, 2011
  */
 public class Pool <T> {
 	public interface PoolObjectFactory<T> {

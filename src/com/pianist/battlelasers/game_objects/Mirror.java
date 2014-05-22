@@ -11,7 +11,6 @@ import android.graphics.Point;
  * since its last tap
  * 
  * @author Alex Szoke & Peter Gokhshteyn
- * @version Date: June 16, 2013
  */
 public class Mirror
 {

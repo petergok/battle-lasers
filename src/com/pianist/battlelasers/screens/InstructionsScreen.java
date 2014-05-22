@@ -20,7 +20,6 @@ import com.pianist.battlelasers.input_handlers.Input.TouchEvent;
  * back
  * 
  * @author Alex Szoke & Peter Gokhshteyn
- * @version Date: June 16, 2013
  */
 public class InstructionsScreen extends Screen
 {

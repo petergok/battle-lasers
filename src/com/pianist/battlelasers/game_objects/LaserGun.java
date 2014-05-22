@@ -10,7 +10,6 @@ import android.graphics.Point;
  * the game grid
  * 
  * @author Alex Szoke & Peter Gokhshteyn
- * @version Date: June 16, 2013
  */
 public class LaserGun
 {

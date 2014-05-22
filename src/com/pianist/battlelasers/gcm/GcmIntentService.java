@@ -10,6 +10,12 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+/**
+ * Intent service that receives GCM intents
+ * 
+ * @author Peter Gokhshteyn
+ *
+ */
 public class GcmIntentService extends IntentService {
 	
 	private static String TAG = "GcmIntentService";
@@ -24,42 +30,42 @@ public class GcmIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+    	// Get message data from the intent
         Bundle extras = intent.getExtras();
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
-        // The getMessageType() intent parameter must be the intent you received
-        // in your BroadcastReceiver.
         String messageType = gcm.getMessageType(intent);
 
-        if (!extras.isEmpty()) {  // has effect of unparcelling Bundle
-            /*
-             * Filter messages based on message type. Since it is likely that GCM
-             * will be extended in the future with new message types, just ignore
-             * any message types you're not interested in, or that you don't
-             * recognize.
-             */
+        if (!extras.isEmpty()) {
+        	// Filter messages based on message type
             if (GoogleCloudMessaging.
                     MESSAGE_TYPE_SEND_ERROR.equals(messageType)) {
             	Log.d(TAG, "Send error: " + extras.toString());
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_DELETED.equals(messageType)) {
             	Log.d(TAG, "Deleted messages on server: " + extras.toString());
-            // If it's a regular GCM message, do some work.
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                // Post notification of received message.
                 Log.d(TAG, "Received: " + extras.toString());
                 parseAndReportMessage(extras);
             }
         }
     }
     
+    /**
+     * Called when a message is successfully received, it parses and reports the message to the main activity
+     * 
+     * @param data the message data
+     */
     private void parseAndReportMessage(Bundle data) {
     	try {
     		
+    		// Retrieve the message type
     		String messageType = data.getString("messageType");
     		if (messageType == null) {
     			return;
     		}
+    		
+    		// Based on the message type, retrieve the data associated with it and send a broadcast to the main activity
     		if (messageType.equals("matchFound")) {
     			String otherPlayerName = data.getString("otherPlayerName");
     			int playerNumber = Integer.parseInt(data.getString("playerNumber"));

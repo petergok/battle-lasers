@@ -21,7 +21,6 @@ import android.graphics.Color;
  * menu screen to create the parameters for a match
  * 
  * @author Alex Szoke & Peter Gokhshteyn
- * @version Date: June 16, 2013
  */
 public class GameSetupScreen extends Screen
 {

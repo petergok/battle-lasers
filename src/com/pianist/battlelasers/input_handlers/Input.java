@@ -10,7 +10,6 @@ import android.view.View;
  * touch and key events in the phone
  * 
  * @author Peter Gokhshteyn and "Apress Beginning Android Games"
- * @version Date: June 16, 2013
  */
 public class Input
 {

@@ -15,7 +15,6 @@ import android.view.View.OnTouchListener;
  * The TouchHandler class handles all touch events and stores them in custom TouchEvent objects
  * 
  * @author "Apress Beginning Android Games"
- * @version June, 2011
  */
 public class TouchHandler implements OnTouchListener
 {

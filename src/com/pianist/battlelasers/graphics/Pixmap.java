@@ -9,7 +9,6 @@ import android.graphics.Bitmap;
  * bitmap image and format for that image
  * 
  * @author Alex Szoke & Peter Gokhshteyn
- * @version Date: June 16, 2013
  */
 public class Pixmap
 {

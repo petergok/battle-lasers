@@ -6,7 +6,6 @@ import android.graphics.Point;
  * The Move class stores all the information needed to describe a single move.
  * 
  * @author Peter Gokhshteyn and Alex Szoke
- * @version June 14, 2013
  */
 public class Move
 {

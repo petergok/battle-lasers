@@ -7,7 +7,6 @@ import com.pianist.battlelasers.game_objects.Match;
  * The Screen class defines a general Screen that would be presented in the game
  * 
  * @author Peter Gokhshteyn
- * @version May 26, 2013
  */
 public abstract class Screen {
 	

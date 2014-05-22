@@ -20,7 +20,6 @@ import android.graphics.Color;
  * menu screen to select the game mode
  * 
  * @author Peter Gokhshteyn
- * @version Date: September 9, 2013
  */
 public class GameModeScreen extends Screen
 {

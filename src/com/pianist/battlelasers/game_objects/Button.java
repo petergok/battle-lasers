@@ -11,7 +11,6 @@ import android.graphics.Rect;
  * clicked, released and drawn
  * 
  * @author Alex Szoke & Peter Gokhshteyn
- * @version Date: June 16, 2013
  */
 public class Button
 {

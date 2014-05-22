@@ -29,7 +29,6 @@ import android.graphics.Point;
  * moves
  * 
  * @author Alex Szoke & Peter Gokhshteyn
- * @version Date: June 16, 2013
  */
 public class GameScreen extends Screen
 {
@@ -122,18 +121,19 @@ public class GameScreen extends Screen
 	// The state of the game
 	private GameState state;
 	
+	// Whether the images have loaded yet
 	private boolean loadedImages;
 	
+	// If the game is paused or not, to prevent graphic rendering
 	private volatile boolean paused;
 	
+	// If the user is still waiting for the other player to respond in an online game
 	private volatile boolean mWaitingForPlayer;
 	
+	// Other online flags
 	private boolean mDeclinedDialogShown;
-	
 	private boolean mForfeitDialogShown;
-	
 	private boolean mDisplayed;
-	
 	private boolean mDispose = true;
 
 	/**
@@ -179,6 +179,7 @@ public class GameScreen extends Screen
 		if (!match.isOnline) {
 			nextLayout = match.getNextLayout();
 		} else {
+			// If the match is online, generate the positions based on the player's turn
 			if (match.playerNumberForOnline == 2) {
 				match.currentLayout.generatePositions(true);
 			} else {
@@ -256,7 +257,7 @@ public class GameScreen extends Screen
 		timeSinceStart += deltaTime;
 		laserStartTime += deltaTime;
 		if (!match.timerOn || freezeTime || state == GameState.TapToStart
-				|| shootLaser || (showMenu && !match.isOnline) || game.isDialogShowing() || game.showingAd)
+				|| shootLaser || (showMenu && !match.isOnline) || game.isDialogShowing() || game.isShowingAd())
 		{
 			turnStart += deltaTime;
 		}
@@ -2157,10 +2158,16 @@ public class GameScreen extends Screen
 		}
 	}
 	
+	/**
+	 * Called from drawLaser when either players wins the game
+	 */
 	private void winGame() {
+		// Update the time and game states
 		winStartTime = timeSinceStart;
 		laserDrawEnd = timeSinceStart;
 		showWinner = true;
+		
+		// Update the score based on who won
 		if (playerOneTurn) {
 			match.playerOneScore++;
 			if (match.isOnline) {
@@ -2172,6 +2179,8 @@ public class GameScreen extends Screen
 				game.loseOnlineGame();
 			}
 		}
+		
+		// Vibrate and if the game is online, send to the server that the player made a move to win the game
 		game.vibrate(500);
 		if (match.isOnline && playerOneTurn) {
 			new MakeMoveTask(null, null, playerOne.getDirection() == 2, match.onlineUserId).execute();
@@ -2202,6 +2211,7 @@ public class GameScreen extends Screen
 		}
 		else if (match.isOnline && !playerOneTurn)
 		{
+			// If it is an online game, send the move to the server
 			new MakeMoveTask(lastMoveStart, lastMoveEnd, playerOne.getDirection() == 2, match.onlineUserId).execute();
 		}
 	}
@@ -2888,6 +2898,13 @@ public class GameScreen extends Screen
 		}
 	}
 	
+	/**
+	 * Called when an online move is made
+	 * 
+	 * @param start the start of the move
+	 * @param end the end of the move
+	 * @param turnRight whether to turn the laser right
+	 */
 	public synchronized void onlineMoveMade(Point start, Point end, boolean turnRight) {
 		Move move = new Move(start, end);
 		if (turnRight) {
@@ -2897,10 +2914,11 @@ public class GameScreen extends Screen
 		game.vibrate(250);
 	}
 	
-	public Match getMatch() {
-		return match;
-	}
-	
+	/**
+	 * Called when the user is registered
+	 * 
+	 * @param userId the user id that was registered
+	 */
 	public synchronized void registeredUser(int userId) {
 		if (match != null) {
 			match.onlineUserId = userId;
@@ -2961,15 +2979,22 @@ public class GameScreen extends Screen
 		Assets.winningAnimation = null;
 	}
 	
+	/**
+	 * Called when the online match has started to update the game state
+	 */
 	public synchronized void startOnlineMatch() {
 		state = GameState.Running;
 		mWaitingForPlayer = false;
 		match.matchStarted = true;
 	}
 	
+	/**
+	 * Exit the game
+	 */
 	public void exitGame() {
 		if (match.isOnline) 
 		{
+			// If it's an online match, unregister the player
 			if (match.matchStarted) {
 				match.loseOnlineGame();
 			}

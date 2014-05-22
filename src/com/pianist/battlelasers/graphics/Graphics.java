@@ -20,7 +20,6 @@ import android.graphics.Paint.Style;
  * game
  * 
  * @author Peter Gokhshteyn and "Apress Beginning Android Games"
- * @version Date: June 16, 2013
  */
 public class Graphics
 {

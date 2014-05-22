@@ -13,7 +13,6 @@ import com.pianist.battlelasers.input_handlers.Input.KeyEvent;
  * The KeyboardHandler class reads user input through keyboard button presses
  * 
  * @author Apress Beginning Android Games 
- * @version June, 2011
  */
 public class KeyboardHandler implements OnKeyListener {
 	boolean[] pressedKeys = new boolean[128];
